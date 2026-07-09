@@ -2,6 +2,6 @@ package app;
 
 public class Main {
 	public static void main(String[] args) {
-		System.out.println("I love WeiJian and WeiJun and Dennis. 我爱同性恋，谢谢。");
+		System.out.println("I love WeiJian.");
 	}
 }
