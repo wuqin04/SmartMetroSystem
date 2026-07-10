@@ -1,5 +1,8 @@
 package service;
 
-public class UserService {
+import java.util.HashMap;
+import model.User;
 
+public class UserService {
+	HashMap<String, User> users;
 }
