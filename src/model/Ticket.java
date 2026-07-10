@@ -2,7 +2,6 @@ package model;
 import enums.TicketStatus;
 import enums.TicketType;
 
-
 public class Ticket {
 	
 	private String ticketId;
@@ -73,15 +72,17 @@ public class Ticket {
 		
 	}
 	
+	// Function for cancel ticket
 	public void cancelTicket()
 	{
 		//ticketStatus = TicketStatus.CANCELLED;
 	}
 	
+	// Print the ticket detail
 	public void printTicket()
 	{
 		print("Ticket ID: " + ticketId);
-		//print("Passenger name: " + passenger.getName());
+	//	print("Passenger name: " + passenger.getName());
 	//	print("Source station name: " + source.getName());
 	//	print("Destination station name: " + destination.getName());
 		print("Ticket type: " + ticketType);
@@ -90,6 +91,7 @@ public class Ticket {
 		
 	}
 	
+	// Function for used ticket
 	public void useTicket()
 	{
 		//ticketStatus = TicketStatus.USED;
