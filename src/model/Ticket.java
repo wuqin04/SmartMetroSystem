@@ -1,43 +1,57 @@
 package model;
+import enums.TicketStatus;
+import enums.TicketType;
+
 
 public class Ticket {
 	
-	private String ticketID;
-	private String passenger;
-	private String source;
-	private String destination;
-	private String ticketType;
-	private String status;
+	private String ticketId;
+	private Passenger passenger;
+	private Station source;
+	private Station destination;
+	private TicketType ticketType;
+	private TicketStatus ticketStatus;
 	private double fare;
 	
-	public String getTicketID()
+	
+	public static void print(String text)
 	{
-		return ticketID;
+		System.out.println(text);
 	}
 	
-	public String getPassenger()
+	public String getTicketId()
+	{
+		return ticketId;
+	}
+	
+	public Passenger getPassenger()
 	{
 		return passenger;
 	}
 	
-	public String getSourse()
+	public Station getSource()
 	{
 		return source;
 	}
 	
-	public String getDestination()
+	public Station getDestination()
 	{
 		return destination;
 	}
 	
-	public String getTicketType()
+	public TicketType getTicketType()
 	{                               
 		return ticketType;
 	}
 	
-	public String getStatus()
+	public TicketStatus getStatus()
 	{
-		return status;
+		return ticketStatus;
+	}
+	
+	public void setStatus(TicketStatus aStatus)
+	{
+		ticketStatus = aStatus;
 	}
 	
 	public double getFare()
@@ -45,16 +59,40 @@ public class Ticket {
 		return fare;
 	}
 	
-	public Ticket(String aTicketID, String aPassenger,String aSource, 
-				  String aDestination, String aTicketType, String aStatus, double aFare)
+	public Ticket(String aTicketId, Passenger aPassenger,Station aSource, 
+				  Station aDestination, TicketType aTicketType, double aFare)
 	{
-		ticketID = aTicketID;
+		ticketId = aTicketId;
 		passenger = aPassenger;
 		source = aSource;
 		destination = aDestination;
 		ticketType = aTicketType;
-		status = aStatus;
 		fare = aFare;
+		//ticketStatus = TicketStatus.ACTIVE; 
+		
+		
+	}
+	
+	public void cancelTicket()
+	{
+		//ticketStatus = TicketStatus.CANCELLED;
+	}
+	
+	public void printTicket()
+	{
+		print("Ticket ID: " + ticketId);
+		//print("Passenger name: " + passenger.getName());
+	//	print("Source station name: " + source.getName());
+	//	print("Destination station name: " + destination.getName());
+		print("Ticket type: " + ticketType);
+		print("Fare: RM " + fare);
+		print("Ticket status: " + ticketStatus);
+		
+	}
+	
+	public void useTicket()
+	{
+		//ticketStatus = TicketStatus.USED;
 	}
 
 }
