@@ -82,7 +82,7 @@ public class Ticket {
 	public void printTicket()
 	{
 		print("Ticket ID: " + ticketId);
-	//	print("Passenger name: " + passenger.getName());
+	//  print("Passenger name: " + passenger.getName());
 	//	print("Source station name: " + source.getName());
 	//	print("Destination station name: " + destination.getName());
 		print("Ticket type: " + ticketType);
