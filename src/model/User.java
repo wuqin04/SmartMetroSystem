@@ -82,6 +82,7 @@ public abstract class User {
 		this.userId = userId;
 		this.name = name;
 		this.email = email;
+		this.password = password;
 		this.role = role;
 	}
 	

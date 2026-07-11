@@ -3,7 +3,6 @@ package app;
 import java.util.Scanner;
 
 import enums.UserRole;
-import model.User;
 import service.UserService;
 import exception.InvalidLoginException;
 import model.Passenger;
@@ -77,7 +76,7 @@ public class Main {
 			
 			System.out.printf("[SUCCESS]: Welcome back!");
 		} catch (InvalidLoginException e) {
-			System.out.print("Login Failed! " + e.getMessage());
+			System.out.print("Login Failed!\n" + e.getMessage());
 		}
 	}
 	
@@ -109,7 +108,7 @@ public class Main {
 			
 			System.out.println("[SUCCESS]: Register successfully!");
 		} catch (IllegalArgumentException e) {
-			System.out.print("Register Failed!" + e.getMessage());
+			System.out.print("Register Failed!\n" + e.getMessage());
 		}
 	}
 }
