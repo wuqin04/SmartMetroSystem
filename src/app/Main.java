@@ -72,9 +72,9 @@ public class Main {
 		password = sc.nextLine();
 		
 		try {
-			us.login(email, password);
+			Passenger loggedInUser = (Passenger)us.login(email, password);
 			
-			System.out.printf("[SUCCESS]: Welcome back!");
+			System.out.printf("[SUCCESS]: Welcome back, %s!", loggedInUser.getName());
 		} catch (InvalidLoginException e) {
 			System.out.print("Login Failed!\n" + e.getMessage());
 		}
