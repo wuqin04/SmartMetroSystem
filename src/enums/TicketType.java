@@ -1,5 +1,8 @@
 package enums;
 
-public class TicketType {
+public enum TicketType {
 
+	SINGLE,
+	DAILY,
+	MONTHLY;
 }

@@ -1,5 +1,6 @@
 package enums;
 
-public class UserRole {
-
+public enum UserRole {
+	PASSENGER,
+	ADMIN
 }
