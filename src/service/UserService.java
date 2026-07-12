@@ -10,7 +10,7 @@ public class UserService {
 	public void registerUser(User user) {
 		
 		if (users.containsKey(user.getEmail())) {
-			throw new IllegalArgumentException("[ERROR]: Email is already registered.");
+			throw new IllegalArgumentException("[ERROR]: Email is already registered.\n");
 		}
 		
 		users.put(user.getEmail(), user);
@@ -20,13 +20,13 @@ public class UserService {
 		User foundUser = users.get(email);
 		
 		if (foundUser == null) {
-			throw new InvalidLoginException("[ERROR]: Invalid email.");
+			throw new InvalidLoginException("[ERROR]: Invalid email.\n");
 		}
 		
 		boolean isSuccess = foundUser.login(email, password);
 		
 		if (!isSuccess) {
-			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.");
+			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.\n");
 		}
 		
 		return foundUser;
