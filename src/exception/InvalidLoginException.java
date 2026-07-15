@@ -1,5 +1,8 @@
 package exception;
 
-public class InvalidLoginException {
-
+public class InvalidLoginException extends Exception {
+	
+	public InvalidLoginException(String message) {
+		super(message);
+	}
 }
