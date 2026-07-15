@@ -51,16 +51,4 @@ public class TXTFileManager implements FileManager {
 
 	}
 
-	//Temporary main function, will remove before merge with main.java
-	public static void main(String[] args) {
-	    TXTFileManager fm = new TXTFileManager();
-
-	    fm.saveData(null, "stations.txt");
-
-	    ArrayList<String> lines = (ArrayList<String>) fm.loadData("stations.txt");
-
-	    for (String line : lines) {
-	        System.out.println(line);
-	    }
-	}
 }
