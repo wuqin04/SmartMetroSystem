@@ -15,14 +15,10 @@ public class TXTFileManager implements FileManager {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
-			//Sample data
-			writer.println("S001|KL Sentral|KL");
-			writer.println("S002|Bangsar|KL");
-			
 			writer.close();
-			System.out.println("[SUCCESS] Data saved succesfully");
+			System.out.println("[SUCCESS]: Data saved succesfully.");
 		}catch(IOException e) {
-			System.out.println("[ERROR] Failed to save data");	
+			System.out.println("[ERROR]: Failed to save data.");	
 		}
 		
 	}
@@ -42,25 +38,11 @@ public class TXTFileManager implements FileManager {
 			}
 				reader.close();
 				
-				System.out.println("[SUCCESS] Data loaded successfully");
+				System.out.println("[SUCCESS]: Data loaded successfully.");
 			}catch (IOException e) {
-				System.out.println("[ERROR] Failed to load data");
+				System.out.println("[ERROR]: Failed to load data.");
 			}
 			
 			return lines;
-
-	}
-
-	//Temporary main function, will remove before merge with main.java
-	public static void main(String[] args) {
-	    TXTFileManager fm = new TXTFileManager();
-
-	    fm.saveData(null, "stations.txt");
-
-	    ArrayList<String> lines = (ArrayList<String>) fm.loadData("stations.txt");
-
-	    for (String line : lines) {
-	        System.out.println(line);
-	    }
 	}
 }
