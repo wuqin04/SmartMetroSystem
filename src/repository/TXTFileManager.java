@@ -15,10 +15,6 @@ public class TXTFileManager implements FileManager {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
-			//Sample data
-			writer.println("S001|KL Sentral|KL");
-			writer.println("S002|Bangsar|KL");
-			
 			writer.close();
 			System.out.println("[SUCCESS] Data saved succesfully");
 		}catch(IOException e) {
@@ -48,7 +44,5 @@ public class TXTFileManager implements FileManager {
 			}
 			
 			return lines;
-
 	}
-
 }
