@@ -91,7 +91,11 @@ public abstract class User {
 	}
 	
 	public void viewProfile() {
-		
+		System.out.println("\n[PROFILE INFORMATION]");
+		System.out.println("Name: " + this.name);
+		System.out.println("Email: " + this.email);
+		System.out.println("Role: " + this.role);
+		System.out.println("Password: " + this.password);
 	}
 	
 	public void editProfile(String name, String email) {

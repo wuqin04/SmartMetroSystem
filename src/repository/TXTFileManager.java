@@ -17,11 +17,14 @@ public class TXTFileManager implements FileManager {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
+<<<<<<< HEAD
 	        List<?> list = (List<?>) data;
 	        for (Object obj : list) {
 	        	writer.println(obj.toString());
 	        }			
 			
+=======
+>>>>>>> branch 'main' of https://github.com/wuqin04/SmartMetroSystem.git
 			writer.close();
 			System.out.println("[SUCCESS] Data saved successfully");
 		}catch(Exception e) {
@@ -52,7 +55,5 @@ public class TXTFileManager implements FileManager {
 			}
 			
 			return lines;
-
 	}
-
 }
