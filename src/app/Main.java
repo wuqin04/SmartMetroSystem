@@ -163,7 +163,7 @@ public class Main {
 					
 					try {
 						passenger.topUp(amount);
-						System.out.println("[SUCCESS]: Successfully added RM" + amount + " to your balance.");
+						System.out.printf("[SUCCESS]: Successfully added RM%.2f to your balance.\n", amount);
 					} catch (IllegalArgumentException e) {
 						System.out.println("Top-up Failed!\n" + e.getMessage());
 					}
@@ -171,6 +171,9 @@ public class Main {
 				break;
 			case 3:
 				// call buy ticket method
+				int ticketType = 0;
+				
+				System.out.println("[BUY TICKET MENU]");
 				passenger.buyTicket(null);
 				break;
 			case 4:

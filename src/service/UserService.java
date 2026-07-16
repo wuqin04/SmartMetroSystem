@@ -1,7 +1,10 @@
 package service;
 
 import java.util.HashMap;
+
 import model.User;
+import repository.FileManager;
+import repository.TXTFileManager;
 import exception.InvalidLoginException;
 
 public class UserService {
