@@ -17,21 +17,18 @@ public class TXTFileManager implements FileManager {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
-<<<<<<< HEAD
-	        List<?> list = (List<?>) data;
-	        for (Object obj : list) {
-	        	writer.println(obj.toString());
-	        }			
-			
-=======
->>>>>>> branch 'main' of https://github.com/wuqin04/SmartMetroSystem.git
-			writer.close();
-			System.out.println("[SUCCESS] Data saved successfully");
-		}catch(Exception e) {
-			System.out.println("[ERROR] Failed to save data");	
-		}
-		
-	}
+            List<?> list = (List<?>) data;
+            for (Object obj : list) {
+                writer.println(obj.toString());
+            }
+
+            writer.close();
+            System.out.println("[SUCCESS] Data saved successfully");
+        }catch(Exception e) {
+            System.out.println("[ERROR] Failed to save data");
+        }
+
+    }
 
 	//Load all lines from a text file and return as ArrayList<String>
 	@Override
