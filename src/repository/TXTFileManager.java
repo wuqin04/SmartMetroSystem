@@ -16,9 +16,9 @@ public class TXTFileManager implements FileManager {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
 			writer.close();
-			System.out.println("[SUCCESS]: Data saved succesfully.");
+			System.out.println("[SUCCESS] Data saved succesfully");
 		}catch(IOException e) {
-			System.out.println("[ERROR]: Failed to save data.");	
+			System.out.println("[ERROR] Failed to save data");	
 		}
 		
 	}
@@ -38,9 +38,9 @@ public class TXTFileManager implements FileManager {
 			}
 				reader.close();
 				
-				System.out.println("[SUCCESS]: Data loaded successfully.");
+				System.out.println("[SUCCESS] Data loaded successfully");
 			}catch (IOException e) {
-				System.out.println("[ERROR]: Failed to load data.");
+				System.out.println("[ERROR] Failed to load data");
 			}
 			
 			return lines;

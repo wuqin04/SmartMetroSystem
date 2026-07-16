@@ -4,7 +4,7 @@ import enums.TicketType;
 
 public class Ticket {
 	
-	private String ticketId;
+	public String ticketId;
 	private Passenger passenger;
 	private Station source;
 	private Station destination;
@@ -45,6 +45,7 @@ public class Ticket {
 		return fare;
 	}
 	
+	// Update the ticket status, an active ticket can only be changed to USED or CANCELLED
 	public void setStatus(TicketStatus status){
 		
 		if(status == null) {
@@ -70,6 +71,7 @@ public class Ticket {
 			
 	}
 	
+	// Constructor for ticket, and validation for every information
 	public Ticket(String ticketId, Passenger passenger,Station source, 
 				  Station destination, TicketType ticketType, double fare){
 		
