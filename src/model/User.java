@@ -74,7 +74,7 @@ public abstract class User {
 		}
 		
 		if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("[ERROR]: Invalid email format.");
+            throw new IllegalArgumentException("[ERROR]: Ix	nvalid email format.");
         }
 		
 		Objects.requireNonNull(role, "[ERROR]: User role cannot be null.");
@@ -100,5 +100,53 @@ public abstract class User {
 	
 	public void editProfile(String name, String email) {
 		
+		// check name and email cannot be null
+		if(name == null) {
+			throw new IllegalArgumentException("[ERROR]: Name cannot be null.");
+		}
+		
+		if(email == null) {
+			throw new IllegalArgumentException("[ERROR]: Email cannot be null.");
+		} 
+		
+		// remove the spaces from the existing name and email
+		String newName = name.strip();
+	    String newEmail = email.strip();
+		
+	    // to make sure name and email is not empty and match the format 
+		if(newName.isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: Name cannot be empty or spaces only.");
+		}
+		
+		if(!newName.matches("^[a-zA-Z]+(?: [a-zA-Z]+)")) {
+			throw new IllegalArgumentException("[ERROR]: Name can only contains letters and spaces.");
+		}
+		
+		if(newEmail.isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: Email cannot be empty or spaces only.");
+		} 
+		
+		if(!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+			throw new IllegalArgumentException("[ERROR]: Invalid email format.");
+		}
+		
+		// to check whether the new name and email are same or not
+		boolean nameChanged = !this.name.equalsIgnoreCase(newName);
+		boolean emailChanged = !this.email.equalsIgnoreCase(newEmail);
+		
+		this.name = newName;
+		this.email = newEmail;
+		
+		if(nameChanged) {
+			System.out.println("Name has been changed.");
+		} else {
+			System.out.println("Name remains unchanged.");
+		}
+		
+		if(emailChanged) {
+			System.out.println("Email has been changed.");
+		} else {
+			System.out.println("Email remains unchanged.");
+		}
 	}
 }

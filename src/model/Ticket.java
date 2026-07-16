@@ -12,11 +12,6 @@ public class Ticket {
 	private TicketStatus ticketStatus;
 	private double fare;
 	
-	
-	public static void print(String text){
-		System.out.println(text);
-	}
-	
 	public String getTicketId(){
 		return ticketId;
 	}
@@ -80,19 +75,19 @@ public class Ticket {
 			
 		}
 		
-		if(passenger == null){
+		if(passenger == null || ticketId.trim().isEmpty()){
 			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null.");
 		}
 		
-		if(source == null){ // Need compare Station Id when Station.java is build.
+		if(source == null || ticketId.trim().isEmpty()){ // Need compare Station Id when Station.java is build.
 			throw new IllegalArgumentException("[ERROR]: Source station cannot be null.");
 		}
 
-		if(destination == null){ // Need compare Station Id when Station.java is build.
+		if(destination == null || ticketId.trim().isEmpty()){ // Need compare Station Id when Station.java is build.
 			throw new IllegalArgumentException("[ERROR]: Destination station cannot be null.");
 		}
 		
-		if(ticketType == null){
+		if(ticketType == null || ticketId.trim().isEmpty()){
 			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null.");	
 		}
 		
@@ -112,13 +107,13 @@ public class Ticket {
 	
 	// Print the ticket detail
 	public void printTicket(){
-		print("Ticket ID: " + ticketId);
-		print("Passenger name: " + passenger.getName());
-	//	print("Source station name: " + source.getName());
-	//	print("Destination station name: " + destination.getName());
-		print("Ticket type: " + ticketType);
+		System.out.println("Ticket ID: " + ticketId);
+		System.out.println("Passenger name: " + passenger.getName());
+	//	System.out.println("Source station name: " + source.getName());
+	//	System.out.println("Destination station name: " + destination.getName());
+		System.out.println("Ticket type: " + ticketType);
 		System.out.printf("Fare: RM %.2f%n", fare);
-		print("Ticket status: " + ticketStatus);
+		System.out.println("Ticket status: " + ticketStatus);
 		
 	}
 	
