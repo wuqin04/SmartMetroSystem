@@ -1,10 +1,12 @@
 package repository;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class TXTFileManager implements FileManager {
@@ -15,17 +17,23 @@ public class TXTFileManager implements FileManager {
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(fileName));
 			
-			writer.close();
-			System.out.println("[SUCCESS] Data saved succesfully");
-		}catch(IOException e) {
-			System.out.println("[ERROR] Failed to save data");	
-		}
-		
-	}
+            List<?> list = (List<?>) data;
+            for (Object obj : list) {
+                writer.println(obj.toString());
+            }
+
+            writer.close();
+            System.out.println("[SUCCESS] Data saved successfully");
+        }catch(Exception e) {
+            System.out.println("[ERROR] Failed to save data");
+        }
+
+    }
 
 	//Load all lines from a text file and return as ArrayList<String>
 	@Override
 	public Object loadData(String fileName) {
+		
 		ArrayList<String> lines = new ArrayList<>();
 		
 		try {
@@ -39,7 +47,7 @@ public class TXTFileManager implements FileManager {
 				reader.close();
 				
 				System.out.println("[SUCCESS] Data loaded successfully");
-			}catch (IOException e) {
+			}catch (Exception e) {
 				System.out.println("[ERROR] Failed to load data");
 			}
 			
