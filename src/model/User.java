@@ -92,6 +92,7 @@ public abstract class User {
 	
 	public void viewProfile() {
 		System.out.println("\n[PROFILE INFORMATION]");
+		System.out.println("User Unique ID: " + this.userId);
 		System.out.println("Name: " + this.name);
 		System.out.println("Email: " + this.email);
 		System.out.println("Role: " + this.role);
