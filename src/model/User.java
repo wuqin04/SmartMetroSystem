@@ -98,7 +98,7 @@ public abstract class User {
 		System.out.println("Password: " + this.password);
 	}
 	
-	public void editProfile(String name, String email) {
+	public void editProfile(String name, String email, String currPassword, String newPassword, String confirmPassword) {
 		
 		// check name and email cannot be null
 		if(name == null) {
@@ -121,7 +121,7 @@ public abstract class User {
 		if(!newName.matches("^[a-zA-Z]+(?: [a-zA-Z]+)")) {
 			throw new IllegalArgumentException("[ERROR]: Name can only contains letters and spaces.");
 		}
-		
+			
 		if(newEmail.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Email cannot be empty or spaces only.");
 		} 
@@ -129,13 +129,72 @@ public abstract class User {
 		if(!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
 			throw new IllegalArgumentException("[ERROR]: Invalid email format.");
 		}
+	
+		// Check whether password edit is requested
+		boolean passwordChangeRequested = currPassword != null && !currPassword.isEmpty()
+									|| newPassword != null && !newPassword.isEmpty()
+		 							|| confirmPassword != null && !confirmPassword.isEmpty();		
 		
+		boolean passwordChanged = false;
+		
+		if(passwordChangeRequested) {
+			
+			if(currPassword == null || currPassword.isEmpty()) {
+				throw new IllegalArgumentException("[ERROR]: Current password cannot be null.");
+			}
+			
+			if(newPassword == null || newPassword.isEmpty()) {
+				throw new IllegalArgumentException("[ERROR]: New password cannot be null.");
+			}
+			
+			if(confirmPassword == null || confirmPassword.isEmpty()) {
+				throw new IllegalArgumentException("[ERROR]: Confirm password cannot be null");
+			}
+			
+			if(!this.password.equals(currPassword)) {
+				throw new IllegalArgumentException("[ERROR]: Current password is incorrect.");
+			}
+			
+			if(newPassword.length() < 8) {
+				throw new IllegalArgumentException("[ERROR]: New password must be at least 8 characters.");
+			}
+			
+			if(newPassword.contains(" ")) {
+				throw new IllegalArgumentException("[ERROR]: New password cannot contain spaces.");
+			}
+			
+			if(!newPassword.matches(".*[A-Z].*")) {
+				throw new IllegalArgumentException("[ERROR]: New password must contain at least one uppercase letter.");
+			}
+			
+			if(!newPassword.matches(".*[a-z].*")) {
+				throw new IllegalArgumentException("[ERROR]: New password must contain at least one lowercase letter.");
+			}
+			
+			if(!newPassword.matches(".*[0-9].*")) {
+				throw new IllegalArgumentException("[ERROR]: New password must contain at least one number.");
+			}
+			
+			if(this.password.equals(newPassword)) {
+				throw new IllegalArgumentException("[ERROR]: New password cannot be same as current password.");
+			}
+			
+			if(!newPassword.equals(confirmPassword)) {
+				throw new IllegalArgumentException("[ERROR]: Confirm password does not match new password.");
+			}
+			
+			passwordChanged = true;
+		}
 		// to check whether the new name and email are same or not
-		boolean nameChanged = !this.name.equalsIgnoreCase(newName);
+		boolean nameChanged = !this.name.equals(newName);
 		boolean emailChanged = !this.email.equalsIgnoreCase(newEmail);
 		
 		this.name = newName;
 		this.email = newEmail;
+		
+		if(passwordChanged) {
+			this.password = newPassword;
+		}
 		
 		if(nameChanged) {
 			System.out.println("Name has been changed.");
@@ -147,6 +206,12 @@ public abstract class User {
 			System.out.println("Email has been changed.");
 		} else {
 			System.out.println("Email remains unchanged.");
+		}
+		
+		if(passwordChanged) {
+			System.out.println("Password has been changed.");
+		} else {
+			System.out.println("Password remains unchanged.");
 		}
 	}
 }
