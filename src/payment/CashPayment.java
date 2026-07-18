@@ -6,7 +6,7 @@ public class CashPayment implements Payment {
     public boolean pay(double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException(
-                    "Payment amount must be greater than zero."
+                    "[ERROR]: Payment amount must be greater than zero."
                 );
             }
 
