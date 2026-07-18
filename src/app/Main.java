@@ -37,13 +37,16 @@ public class Main {
 				sc.nextLine();
 				loginMenu(sc, us, passengerUI);
 				break;
+				
 			case 2:
 				sc.nextLine();
 				registerMenu(sc, us);
 				break;
+				
 			case 99:
 				System.out.println("Exiting program...");
 				break;
+				
 			default:
 				System.out.println("[ERROR]: Invalid choice. Only input 1-2 and 99 to exit.");
 				continue;

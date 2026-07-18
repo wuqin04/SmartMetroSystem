@@ -246,7 +246,7 @@ public class PassengerUI {
 		            	Ticket ticket = new Ticket(ticketId, passenger, source, destination, selectedType, fare);
 		                passenger.buyTicket(ticket);
 		                System.out.printf("[SUCCESS]: Ticket purchased successfully! Remaining Balance: RM%.2f\n", passenger.getBalance());
-		            } catch (IllegalArgumentException e) { // Catch insufficient balance errors!
+		            } catch (IllegalArgumentException e) {
 		                System.out.println("[FAILED]: " + e.getMessage());
 		            }
 		        } else {
