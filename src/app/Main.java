@@ -2,19 +2,18 @@ package app;
 
 import java.util.Scanner;
 
+import ui.PassengerUI;
 import model.User;
+import model.Passenger;
 import enums.UserRole;
 import service.UserService;
 import exception.InvalidLoginException;
-import model.Passenger;
-import model.Admin;
 
 public class Main {
-	private static int idCounter = 0;
-	
 	public static void main(String[] args) {
-		Scanner sc 	   = new Scanner(System.in);
-		UserService us = new UserService();
+		Scanner sc 	   			= new Scanner(System.in);
+		UserService us 			= new UserService();
+		PassengerUI passengerUI = new PassengerUI(sc);
 		
 		int choice = 0;
 		
@@ -36,23 +35,28 @@ public class Main {
 			switch (choice) {
 			case 1:
 				sc.nextLine();
-				loginMenu(sc, us);
+				loginMenu(sc, us, passengerUI);
 				break;
+				
 			case 2:
 				sc.nextLine();
 				registerMenu(sc, us);
 				break;
+				
 			case 99:
 				System.out.println("Exiting program...");
 				break;
+				
 			default:
-				System.out.println("[ERROR]: Invalid choice. only input 1-2 and 99 to exit.");
+				System.out.println("[ERROR]: Invalid choice. Only input 1-2 and 99 to exit.");
 				continue;
 			}
 		}
+		
+		sc.close();
 	}
 	
-	public static void loginMenu(Scanner sc, UserService us) {
+	public static void loginMenu(Scanner sc, UserService us, PassengerUI passengerUI) {
 		// temp information
 		String email;
 		String password;
@@ -71,10 +75,10 @@ public class Main {
 			System.out.printf("[SUCCESS]: Welcome back, %s!\n", loggedInUser.getName());
 			
 			if (loggedInUser.getRole() == UserRole.PASSENGER) {
-				userMenu(sc, (Passenger)loggedInUser);
+				passengerUI.loadDashboard((Passenger)loggedInUser);
 			}
 			else if (loggedInUser.getRole() == UserRole.ADMIN) {
-				adminMenu(sc, (Admin)loggedInUser);
+				// TODO: call adminUI.java method
 			}
 		} catch (InvalidLoginException e) {
 			System.out.print("Login Failed!\n" + e.getMessage());
@@ -101,7 +105,7 @@ public class Main {
 		System.out.print("Create your password: ");
 		password = sc.nextLine();
 		
-		userId = "USER" + idCounter++;
+		userId = "USER" + System.currentTimeMillis();
 		
 		try {
 			passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0.0);
@@ -111,93 +115,5 @@ public class Main {
 		} catch (IllegalArgumentException e) {
 			System.out.print("Register Failed!\n" + e.getMessage());
 		}
-	}
-	
-	public static void userMenu(Scanner sc, Passenger passenger) {
-		int choice = -1;
-		
-		while (choice != 0) {
-			System.out.printf("\n[%s's PASSENGER MENU]\n", passenger.getName());
-			
-			System.out.println("(1) View Profile");
-			System.out.println("(2) Top Up Balance");
-			System.out.println("(3) Buy Ticket");
-			System.out.println("(4) Cancel Ticket");
-			System.out.println("(5) View Ticket");
-			System.out.println("(0) Log Out");
-			System.out.println("(99) Exit Program");
-			
-			System.out.print("Enter your choice: ");
-			
-			if (!sc.hasNextInt()) {
-				System.out.print("[ERROR]: That is not a valid number. Try again.\n");
-				sc.next();
-				continue;
-			}
-			
-			choice = sc.nextInt();
-			
-			switch (choice) {
-			case 1:
-				// call profile method
-				passenger.viewProfile();
-				break;
-			case 2:
-				double amount = 0;
-				while (amount != -1) {
-					System.out.print("Enter amount to top up (-1 back to menu): RM ");
-					
-					if (!sc.hasNextDouble()) {
-						System.out.println("[ERROR]: Please enter a valid number.");
-						sc.next();
-						continue;
-					}
-					
-					amount = sc.nextDouble();
-					sc.nextLine();
-					
-					if (amount == -1) {
-						System.out.println("Returning to menu...\n");
-						break;
-					}
-					
-					try {
-						passenger.topUp(amount);
-						System.out.printf("[SUCCESS]: Successfully added RM%.2f to your balance.\n", amount);
-					} catch (IllegalArgumentException e) {
-						System.out.println("Top-up Failed!\n" + e.getMessage());
-					}
-				}
-				break;
-			case 3:
-				// call buy ticket method
-				int ticketType = 0;
-				
-				System.out.println("[BUY TICKET MENU]");
-				passenger.buyTicket(null);
-				break;
-			case 4:
-				// call cancel ticket method
-				
-				break;
-			case 5:
-				// call view ticket method
-				break;
-			case 0:
-				System.out.println("Logging out...");
-				break;
-			case 99:
-				System.out.println("Exiting program...");
-				System.exit(0);
-				break;
-			default:
-				System.out.println("[ERROR]: Invalid choice. Only input 0-5 or 99 to exit.");
-				continue;
-			}
-		}
-	}
-	
-	public static void adminMenu(Scanner sc, Admin admin) {
-		
 	}
 }
