@@ -1,20 +1,26 @@
 package service;
 import java.util.Scanner;
+import model.Station;
+import java.util.ArrayList;
+
 
 public class StationService {
 	
-	private ArrayList<Station> stations;
+	private ArrayList<Station> stations=new ArrayList<>();
 	Scanner sc= new Scanner(System.in);
 	
-	public void addStation() {
-		System.out.println("Insert new station ID: ");
-		//unknown ID var.=sc.nextLine();
-		
-		System.out.println("Insert the new station's name: ");
-		//unknown name var.=sc.nextLine();
-		
-		System.out.println("Insert the new station's location: ");
-		//unknown loc var.=sc.nextLine();
+	public void addStation(Station station) {     
+        stations.add(station);
+        System.out.println("[SUCCESS]: Station \"" + station.getName() + "\" has been added.");
 	}
 	
+	/*
+	public Station searchStation() {
+		return null ;
+	}
+	
+	public void viewStations() {
+		
+	}
+	*/
 }
