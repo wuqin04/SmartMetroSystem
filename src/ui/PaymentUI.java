@@ -1,18 +1,22 @@
-package payment;
+package ui;
 
 import java.util.Scanner;
+import payment.Payment;
+import payment.CardPayment;
+import payment.CashPayment;
+import service.PaymentService;
 
-public class PaymentMenu {
+public class PaymentUI {
     private final Scanner scanner;
     private final PaymentService paymentService = new PaymentService();
 
-    public PaymentMenu(Scanner scanner) {
+    public PaymentUI(Scanner scanner) {
         this.scanner = scanner;
     }
 
     public void showMenu(double amount) {
         if (amount <= 0) {
-            System.out.println("[ERROR] The ticket fare is invalid. Payment cannot continue.");
+            System.out.println("[ERROR]: The ticket fare is invalid. Payment cannot continue.");
             return;
         }
 
@@ -31,11 +35,19 @@ public class PaymentMenu {
         } else if (choice == 2) {
             payment = new CashPayment();
         } else {
-            System.out.println("[ERROR] Invalid payment method.");
+            System.out.println("[ERROR]: Invalid payment method.");
             return;
         }
 
-        PaymentService.processPayment(payment, amount);
+        try {
+            boolean isPaid = paymentService.processPayment(payment, amount);
+
+            if (isPaid) {
+                System.out.println("[SUCCESS]: Payment processed successfully.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("[ERROR]: " + e.getMessage());
+        }
     }
 
     private int readInt() {

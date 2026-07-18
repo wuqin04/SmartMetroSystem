@@ -10,16 +10,17 @@ public class CardPayment implements Payment {
     @Override
     public boolean pay(double amount) {
         if (amount <= 0) {
-            System.out.println("[ERROR] Payment amount must be greater than zero.");
-            return false;
-        }
+            throw new IllegalArgumentException(
+                    "[ERROR]: Payment amount must be greater than zero."
+                );
+            }
 
-        if (cardNumber == null || cardNumber.isBlank()) {
-            System.out.println("[ERROR] No card number entered. Payment cancelled.");
-            return false;
-        }
+            if (cardNumber == null || cardNumber.trim().isEmpty()) {
+                throw new IllegalArgumentException(
+                    "[ERROR]: No card number entered. Payment cancelled."
+                );
+            }
 
-        System.out.printf("Card payment of %.2f processed.%n", amount);
-        return true;
+            return true;
+        }
     }
-}
