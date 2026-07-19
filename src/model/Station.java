@@ -25,6 +25,14 @@ public class Station {
 		return name;
 	}
 	
+	public String getLocation() {
+		return location;
+	}
+	
+	public String getStationId() {
+		return stationId;
+	}
+	
 	public void setLocation(String location) {
 		this.location=location;
 	}
@@ -67,7 +75,7 @@ public class Station {
 			stationService.addStation(newStation);
 			break;
 		case 2:
-			//stationService.searchStation();
+			stationService.searchStation();
 			break;
 		case 3:
 			//stationService.viewStations();
