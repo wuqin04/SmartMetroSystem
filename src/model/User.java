@@ -74,7 +74,7 @@ public abstract class User {
 		}
 		
 		if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("[ERROR]: Ix	nvalid email format.");
+            throw new IllegalArgumentException("[ERROR]: Invalid email format.");
         }
 		
 		Objects.requireNonNull(role, "[ERROR]: User role cannot be null.");
