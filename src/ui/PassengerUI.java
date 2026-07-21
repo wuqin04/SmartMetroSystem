@@ -166,7 +166,11 @@ public class PassengerUI {
 	}
 	
 	private void viewTicketAction(Passenger passenger) {
-		ts.viewTicket();
+		try {
+			ts.viewTickets(passenger);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	private void buyTicketAction(Passenger passenger) {
@@ -298,6 +302,10 @@ public class PassengerUI {
 	}
 	
 	private void cancelTicketAction(Passenger passenger) {
-		
+		try {
+			ts.cancelTicket(ticketId, passenger);
+		} catch (IllegalArgumentException e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }
