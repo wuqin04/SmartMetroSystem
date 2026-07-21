@@ -1,19 +1,28 @@
 package app;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 import ui.PassengerUI;
+import model.Ticket;
 import model.User;
 import model.Passenger;
+import fare.FareCalculator;
 import enums.UserRole;
 import service.UserService;
+import service.TicketService;
 import exception.InvalidLoginException;
 
 public class Main {
 	public static void main(String[] args) {
-		Scanner sc 	   			= new Scanner(System.in);
-		UserService us 			= new UserService();
-		PassengerUI passengerUI = new PassengerUI(sc);
+		Ticket ticket;
+		FareCalculator fareCalculator 	= new FareCalculator();
+		ArrayList<Ticket> tickets 		= new ArrayList<Ticket>();
+		Scanner sc 	   					= new Scanner(System.in);
+		UserService us 					= new UserService();
+		TicketService ts				= new TicketService(tickets, fareCalculator);
+		PassengerUI passengerUI 		= new PassengerUI(sc, ts);
+		
 		
 		int choice = 0;
 		

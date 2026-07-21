@@ -6,12 +6,18 @@ import enums.TicketType;
 import model.Passenger;
 import model.Station;
 import model.Ticket;
+import payment.Payment;
+import payment.CardPayment;
+import payment.CashPayment;
+import service.TicketService;
 
 public class PassengerUI {
 	private Scanner sc;
+	private TicketService ts;
 	
-	public PassengerUI(Scanner sc) {
+	public PassengerUI(Scanner sc, TicketService ts) {
 		this.sc = sc;
+		this.ts = ts;
 	}
 	
 	public void loadDashboard(Passenger passenger) {
@@ -160,7 +166,7 @@ public class PassengerUI {
 	}
 	
 	private void viewTicketAction(Passenger passenger) {
-		
+		ts.viewTicket();
 	}
 	
 	private void buyTicketAction(Passenger passenger) {
@@ -191,6 +197,7 @@ public class PassengerUI {
 		    TicketType selectedType = null;
 		    Station source = null;
 		    Station destination = null;
+		    Route route = null;
 		    double fare = 0.0;
 		    
 		    switch (ticketChoice) {
@@ -203,6 +210,9 @@ public class PassengerUI {
 		            
 		            System.out.print("Enter Destination Station: ");
 		            String destInput = sc.nextLine();
+		            
+		            // TODO: need Route and RouteService
+		            route = rs.findRoute(source, destination);
 		            
 		            // TODO: Get real station object from stationService
 		            
@@ -228,7 +238,7 @@ public class PassengerUI {
 		    
 		    // If a valid type was selected, proceed to checkout
 		    if (selectedType != null) {
-		        System.out.println("\n[ORDER SUMMARY]");
+		    	System.out.println("\n[ORDER SUMMARY]");
 		        System.out.println("Ticket Type : " + selectedType);
 		        if (selectedType == TicketType.SINGLE) {
 		            System.out.println("Route     : " + source.getName() + " to " + destination.getName());
@@ -238,21 +248,51 @@ public class PassengerUI {
 		        
 		        String confirm = sc.nextLine();
 		        
-		        if (confirm.equalsIgnoreCase("Y")) {
-		        	String ticketId = "T" + System.currentTimeMillis();
-		        	
-		            try {
-		                // Pass the gathered data into your backend method
-		            	Ticket ticket = new Ticket(ticketId, passenger, source, destination, selectedType, fare);
-		                passenger.buyTicket(ticket);
-		                System.out.printf("[SUCCESS]: Ticket purchased successfully! Remaining Balance: RM%.2f\n", passenger.getBalance());
-		            } catch (IllegalArgumentException e) {
-		                System.out.println("[FAILED]: " + e.getMessage());
-		            }
-		        } else {
-		            System.out.println("Purchase cancelled. Returning to menu...");
-		        }
-		    }
+		        while (true) {
+		        	if (confirm.equalsIgnoreCase("Y")) {
+			            System.out.println("\n[PAYMENT METHOD]");
+			            System.out.println("1. Cash");
+			            System.out.println("2. Card");
+			            System.out.print("Enter your choice: ");
+			            
+			            if (!sc.hasNextInt()) {
+			                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
+							sc.next();
+							continue;
+						}
+			            
+			            int payOption = sc.nextInt();
+			            
+			            Payment paymentMethod = null;
+			            
+			            switch (payOption) {
+			            case 1:
+			            	paymentMethod = new CashPayment();
+			            	break;
+			            case 2:
+			            	System.out.println("Enter Card Number: ");
+			            	String cardNum = sc.nextLine();
+			            	paymentMethod = new CardPayment(cardNum);
+			            	break;
+			            default:
+			                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
+			                continue;
+			            }
+			            
+			            try {
+			                if (paymentMethod.pay(fare)) {
+			                    String ticketId = "T" + System.currentTimeMillis();
+			                    ts.buyTicket(passenger, route, selectedType);
+			                }
+			            } catch (IllegalArgumentException e) {
+			                System.out.println(e.getMessage()); 
+			            }
+			            
+			        } else {
+			            System.out.println("Purchase cancelled. Returning to menu...");
+			        }
+			    }
+	        }   
 		}
 		
 	}

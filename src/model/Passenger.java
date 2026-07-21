@@ -14,7 +14,21 @@ public class Passenger extends User {
 	}
 	
 	public void buyTicket(Ticket ticket) {
+		if (ticket == null) {
+			throw new IllegalArgumentException("[ERROR]: Ticket cannot be null.");
+		}
 		
+		double fare = ticket.getFare();
+		
+		if (fare <= 0 ) {
+			throw new IllegalArgumentException("[ERROR]: Ticket fare must be greather than 0.");
+		}
+		
+		if (this.balance < fare) {
+			throw new IllegalArgumentException(String.format("[ERROR]: Insufficient balance. You need RM%.2f but only have RM%.2f ", fare, this.balance));
+		}
+		
+		this.balance -= ticket.getFare();
 	}
 	
 	public void viewProfile() {

@@ -23,15 +23,15 @@ public class TicketService {
 	// Buy ticket function
 	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) {
 		if(passenger == null) {
-			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null.");
 		}
 		
 		if(route == null) {
-			throw new IllegalArgumentException("[ERROR]: Route cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Route cannot be null.");
 		}
 		
 		if(type == null) {
-			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null.");
 		}
 		
 		// Generate ticket ID
@@ -72,14 +72,14 @@ public class TicketService {
 				 ticket.cancelTicket();
 				 return;
 			}
-			throw new TicketNotFoundException("[ERROR]: Ticket ID not found.");
 		}
+		throw new TicketNotFoundException("[ERROR]: Ticket ID not found.");
 	}
 	
 	public void viewTicket() {
 		
 		if(tickets.isEmpty()) {
-			System.out.println("[ERROR]: No tickets found.");
+			System.out.println("No tickets found.");
 			return;
 		}
 		
