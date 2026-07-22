@@ -1,11 +1,18 @@
 //add or edit route infos
 package service;
  
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 import model.Route;
 import model.Station;
- 
+
 public final class RouteService {
     private ArrayList<Route> routes;
  
@@ -24,52 +31,86 @@ public final class RouteService {
     }
  
     /**
-     * Finds all stored routes that connect the requested source and destination.
-     * A route is considered a match if it goes directly from source -> destination,
-     * OR if it goes destination -> source, since trains can travel both ways
-     * along the same route.
+     * Finds a sequence of routes connecting the requested source and destination,
+     * traversing through intermediate stations if there is no direct route
+     * (e.g. Kajang -> Bukit Bintang -> TRX). Since trains can travel both ways
+     * along a route, each stored Route is treated as a bidirectional edge.
      *
-     * @return a list of all matching routes (never empty; throws if none found)
+     * Uses breadth-first search over the station graph built from `routes`,
+     * so the returned path is guaranteed to have the fewest possible legs.
+     *
+     * @return an ordered list of routes forming a path from source to destination
+     *         (never empty; throws if no path exists)
      */
     public List<Route> findRoutes(Station source, Station destination) {
         if (source == null || destination == null) {
             throw new IllegalArgumentException("[ERROR]: Source and destination stations cannot be null.");
         }
- 
-        List<Route> matches = new ArrayList<Route>();
- 
+        if (source.equals(destination)) {
+            throw new IllegalArgumentException("[ERROR]: Source and destination stations cannot be the same.");
+        }
+
+        // Build an adjacency list: station -> list of (neighboring station, route used to get there)
+        Map<Station, List<Edge>> graph = new HashMap<>();
         for (Route route : routes) {
-            boolean isForward = route.getSource().equals(source)
-                    && route.getDestination().equals(destination);
-            boolean isBackward = route.getSource().equals(destination)
-                    && route.getDestination().equals(source);
- 
-            if (isForward || isBackward) {
-                matches.add(route);
+        	graph.computeIfAbsent(route.getSource(), _ -> new ArrayList<>())
+            .add(new Edge(route.getDestination(), route));
+        	graph.computeIfAbsent(route.getDestination(), _ -> new ArrayList<>())
+            .add(new Edge(route.getSource(), route));
+        }
+
+        // BFS from source, remembering how we reached each station
+        Queue<Station> queue = new LinkedList<>();
+        Map<Station, Station> cameFromStation = new HashMap<>();
+        Map<Station, Route> cameFromRoute = new HashMap<>();
+        Set<Station> visited = new HashSet<>();
+
+        queue.add(source);
+        visited.add(source);
+
+        while (!queue.isEmpty()) {
+            Station current = queue.poll();
+            if (current.equals(destination)) break;
+
+            for (Edge edge : graph.getOrDefault(current, Collections.emptyList())) {
+                if (!visited.contains(edge.station)) {
+                    visited.add(edge.station);
+                    cameFromStation.put(edge.station, current);
+                    cameFromRoute.put(edge.station, edge.route);
+                    queue.add(edge.station);
+                }
             }
         }
- 
-        if (matches.isEmpty()) {
+
+        if (!visited.contains(destination)) {
             throw new IllegalArgumentException("[ERROR]: No route was found from "
                     + source.getName() + " to " + destination.getName() + ".");
         }
- 
-        return matches;
+
+        // Walk backwards from destination to source to reconstruct the path in order
+        LinkedList<Route> path = new LinkedList<>();
+        Station step = destination;
+        while (!step.equals(source)) {
+            path.addFirst(cameFromRoute.get(step));
+            step = cameFromStation.get(step);
+        }
+
+        return path;
     }
- 
-    /**
-     * Convenience overload: finds routes between two stations regardless of which
-     * one is passed first, since direction no longer matters for matching.
-     * Kept separate from findRoutes(source, destination) only for readability
-     * at call sites where "either direction" is the intent.
-     */
-    public List<Route> findRoutesBothWays(Station stationA, Station stationB) {
-        return findRoutes(stationA, stationB);
+
+    private static class Edge {
+        final Station station;
+        final Route route;
+
+        Edge(Station station, Route route) {
+            this.station = station;
+            this.route = route;
+        }
     }
     /** Prints every stored route to the console, separated by a divider line. */
     public void displayAllRoutes() {
         if (routes.isEmpty()) {
-            System.out.println("[ERROR]: No routes found in the system.");
+            System.out.println("No routes found in the system.");
             return;
         }
  
