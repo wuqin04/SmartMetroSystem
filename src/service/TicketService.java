@@ -18,8 +18,8 @@ public class TicketService {
 	private FareCalculator fareCalculator;
 	
 	public TicketService(ArrayList<Ticket> tickets, FareCalculator fareCalculator) {
-		this.tickets = new ArrayList<Ticket>();
-		this.fareCalculator= new FareCalculator();
+		this.tickets = tickets;
+		this.fareCalculator= fareCalculator;
 	}
 	
 	// Buy ticket function
@@ -39,9 +39,6 @@ public class TicketService {
 		// Generate ticket ID
 		int ticketNumber = tickets.size() + 1;
 		String generatedId = String.format("T%3d", ticketNumber);
-		
-		Station source = route.getSource();
-		Station destination = route.getDestination();
 
 		// fare calculator not create yet.
 		double ticketFare = fareCalculator.calculateFare(route, type);
