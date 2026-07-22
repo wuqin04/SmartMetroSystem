@@ -39,6 +39,9 @@ public class TicketService {
 		// Generate ticket ID
 		int ticketNumber = tickets.size() + 1;
 		String generatedId = String.format("T%3d", ticketNumber);
+		
+		Station source = route.getSource();
+		Station destination = route.getDestination();
 
 		// fare calculator not create yet.
 		double ticketFare = fareCalculator.calculateFare(route, type);
@@ -49,7 +52,7 @@ public class TicketService {
 		}
 		
 		// Create ticket 
-		Ticket ticket = new Ticket(generatedId, passenger, route.getSource(), route.getDestination(), type, ticketFare);
+		Ticket ticket = new Ticket(generatedId, passenger, source, destination, type, ticketFare);
 		passenger.buyTicket(ticket);
 		
 		// Add the ticket into the ArrayList
