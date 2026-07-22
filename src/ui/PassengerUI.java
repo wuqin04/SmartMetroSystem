@@ -32,21 +32,20 @@ public class PassengerUI {
             System.out.println("(99) Exit Program");
             System.out.print("Enter your choice: ");
             
-            int choice = sc.nextInt();
-            sc.nextLine();
+            String choice = sc.nextLine();
             
             switch(choice) {
-            case 1:
+            case "1":
             	profileMenu(passenger);
             	break;
-            case 2:
+            case "2":
             	ticketMenu(passenger);
             	break;
-            case 0:
+            case "0":
             	System.out.println("Logging out...");
             	loggedIn = false;
             	break;
-            case 99:
+            case "99":
             	System.out.println("Exiting program...");
             	System.exit(0);
             default:
@@ -67,20 +66,13 @@ public class PassengerUI {
             System.out.println("(0) Back to Dashboard");
             System.out.print("Enter your choice: ");
             
-            if (!sc.hasNextInt()) {
-				System.out.print("[ERROR]: That is not a valid number. Try again.\n");
-				sc.next();
-				continue;
-			}
-            
-            int choice = sc.nextInt();
-            sc.nextLine();
+            String choice = sc.nextLine();
             
             switch (choice) {
-            case 1:
+            case "1":
                 passenger.viewProfile();
                 break;
-            case 2:
+            case "2":
             	double amount = 0;
 				while (amount != -1) {
 					System.out.print("Enter amount to top up (-1 back to menu): RM");
@@ -108,7 +100,7 @@ public class PassengerUI {
 					}
 				}
 				break;
-            case 0:
+            case "0":
                 back = true; 
                 break;
             default:
@@ -184,16 +176,9 @@ public class PassengerUI {
 		    System.out.println("(0) Back to Ticket Menu");
 		    System.out.print("Enter your choice: ");
 		    
-		    if (!sc.hasNextInt()) {
-		        System.out.println("[ERROR]: Please enter a valid number.");
-		        sc.next();
-		        continue; 
-		    }
+		    String ticketChoice = sc.nextLine();
 		    
-		    int ticketChoice = sc.nextInt();
-		    sc.nextLine();
-		    
-		    if (ticketChoice == 0) {
+		    if (ticketChoice == "0") {
 		    	return;
 		    }
 		    
@@ -205,7 +190,7 @@ public class PassengerUI {
 		    double fare = 0.0;
 		    
 		    switch (ticketChoice) {
-		        case 1:
+		        case "1":
 		            selectedType = TicketType.SINGLE;
 		            
 		            // TODO: The source and destination are created by admin, user cannot choose any by their own
@@ -225,12 +210,12 @@ public class PassengerUI {
 		            fare = 5.00; 
 		            break;
 		            
-		        case 2:
+		        case "2":
 		            selectedType = TicketType.DAILY;
 		            fare = 15.00; // Flat rate
 		            break;
 		            
-		        case 3:
+		        case "3":
 		            selectedType = TicketType.MONTHLY;
 		            fare = 50.00; // Flat rate
 		            break;
@@ -259,21 +244,15 @@ public class PassengerUI {
 			            System.out.println("2. Card");
 			            System.out.print("Enter your choice: ");
 			            
-			            if (!sc.hasNextInt()) {
-			                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
-							sc.next();
-							continue;
-						}
-			            
-			            int payOption = sc.nextInt();
+			            String payOption = sc.nextLine();
 			            
 			            Payment paymentMethod = null;
 			            
 			            switch (payOption) {
-			            case 1:
+			            case "1":
 			            	paymentMethod = new CashPayment();
 			            	break;
-			            case 2:
+			            case "2":
 			            	System.out.println("Enter Card Number: ");
 			            	String cardNum = sc.nextLine();
 			            	paymentMethod = new CardPayment(cardNum);

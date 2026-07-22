@@ -4,55 +4,52 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 import ui.PassengerUI;
+import ui.AdminUI;
 import model.Ticket;
 import model.User;
 import model.Passenger;
+import model.Route;
 import fare.FareCalculator;
 import enums.UserRole;
 import service.UserService;
 import service.TicketService;
+import service.RouteService;
 import exception.InvalidLoginException;
 
 public class Main {
 	public static void main(String[] args) {
-		Ticket ticket;
-		FareCalculator fareCalculator 	= new FareCalculator();
-		ArrayList<Ticket> tickets 		= new ArrayList<Ticket>();
-		Scanner sc 	   					= new Scanner(System.in);
-		UserService us 					= new UserService();
-		TicketService ts				= new TicketService(tickets, fareCalculator);
-		PassengerUI passengerUI 		= new PassengerUI(sc, ts);
+		Ticket 				ticket;
+		Scanner 			sc 	   			= new Scanner(System.in);
+		FareCalculator 		fareCalculator 	= new FareCalculator();
+		ArrayList<Ticket> 	tickets 		= new ArrayList<Ticket>();
+		ArrayList<Route>	routes			= new ArrayList<Route>();
+		UserService 		us 				= new UserService();
+		TicketService 		ts				= new TicketService(tickets, fareCalculator);
+		RouteService		rs				= new RouteService(routes);
+		PassengerUI 		passengerUI 	= new PassengerUI(sc, ts);
+		AdminUI 			adminUI			= new AdminUI(sc);
 		
+		String choice = null;
 		
-		int choice = 0;
-		
-		while (choice != 99) {
+		while (choice != "99") {
 			System.out.println("\n[SMART METRO SYSTEM]");
 			System.out.println("(1)  Login ");
 			System.out.println("(2)  Register");
 			System.out.println("(99) Exit Program ");
 			System.out.print("Enter your choice: ");
 			
-			if (!sc.hasNextInt()) {
-				System.out.print("[ERROR]: That is not a valid number. Try again.\n");
-				sc.next();
-				continue;
-			}
-			
-			choice = sc.nextInt();
+			choice = sc.nextLine();
 			
 			switch (choice) {
-			case 1:
-				sc.nextLine();
+			case "1":
 				loginMenu(sc, us, passengerUI);
 				break;
 				
-			case 2:
-				sc.nextLine();
+			case "2":
 				registerMenu(sc, us);
 				break;
 				
-			case 99:
+			case "99":
 				System.out.println("Exiting program...");
 				break;
 				
