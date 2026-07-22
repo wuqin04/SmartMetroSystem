@@ -69,7 +69,7 @@ public final class RouteService {
     /** Prints every stored route to the console, separated by a divider line. */
     public void displayAllRoutes() {
         if (routes.isEmpty()) {
-            System.out.println("No routes found in the system.");
+            System.out.println("[ERROR]: No routes found in the system.");
             return;
         }
  
