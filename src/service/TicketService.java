@@ -18,8 +18,8 @@ public class TicketService {
 	private FareCalculator fareCalculator;
 	
 	public TicketService(ArrayList<Ticket> tickets, FareCalculator fareCalculator) {
-		this.tickets = new ArrayList<Ticket>();
-		this.fareCalculator= new FareCalculator();
+		this.tickets = tickets;
+		this.fareCalculator= fareCalculator;
 	}
 	
 	// Buy ticket function
@@ -52,7 +52,7 @@ public class TicketService {
 		}
 		
 		// Create ticket 
-		Ticket ticket = new Ticket(generatedId, passenger, route.getSource(), route.getDestination(), type, ticketFare);
+		Ticket ticket = new Ticket(generatedId, passenger, source, destination, type, ticketFare);
 		passenger.buyTicket(ticket);
 		
 		// Add the ticket into the ArrayList
