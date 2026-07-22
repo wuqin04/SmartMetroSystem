@@ -38,7 +38,7 @@ public class TXTFileManager implements FileManager {
 
 	}
 
-	//Load all lines from a text file and return as ArrayList<String>
+	//Load all lines from a text file and return as ArrayList
 	@Override
 	public Object loadData(String fileName) throws FileProcessingException {
 		

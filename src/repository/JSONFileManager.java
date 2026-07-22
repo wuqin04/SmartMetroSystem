@@ -14,6 +14,7 @@ import exception.FileProcessingException;
 
 public class JSONFileManager implements FileManager {
 
+	//Save sample data into JSON file
 	@Override
 	public void saveData(Object data, String fileName) throws FileProcessingException {
 	    try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
@@ -23,7 +24,7 @@ public class JSONFileManager implements FileManager {
 	            JSONArray array = new JSONArray();
 
 	            for (Object obj : list) {
-	                array.put(obj.toString());  // temporary - see note below
+	                array.put(obj.toString());
 	            }
 
 	            writer.println(array.toString());
@@ -38,10 +39,31 @@ public class JSONFileManager implements FileManager {
 	    }
 	}
 
+	//Load all lines from the JSON file and return in to ArrayList
 	@Override
 	public Object loadData(String fileName) throws FileProcessingException {
-		// TODO: build this next
-		return null;
+		ArrayList<String> lines = new ArrayList<>();
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))){
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) !=null) {
+				sb.append(line);
+			}
+			
+			JSONArray array = new JSONArray(sb.toString());
+			for(int i = 0; i < array.length(); i++) {
+				lines.add(array.getString(i));
+			}
+			
+			System.out.println("[SUCCESS]: Data loaded successfully");
+		} catch (Exception e) {
+	        throw new FileProcessingException("[ERROR]: Failed to load data from " + fileName);
+	    }
+
+	    return lines;
 	}
 
 }
+
+
