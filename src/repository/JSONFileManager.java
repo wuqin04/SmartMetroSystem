@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import exception.FileProcessingException;
@@ -24,17 +23,25 @@ public class JSONFileManager implements FileManager {
 	            JSONArray array = new JSONArray();
 
 	            for (Object obj : list) {
-	                array.put(obj.toString());
+	                if (obj == null) continue;
+	                
+	                JSONObject jsonObj;
+	                if(obj instanceof JSONObject) {
+	                	jsonObj = (JSONObject) obj;
+	                }else {
+	                	jsonObj = new JSONObject(obj);
+	                }
+	                array.put(jsonObj);
 	            }
 
-	            writer.println(array.toString());
+	            writer.println(array.toString(4));
 
 	        } else {
 	            throw new FileProcessingException("[ERROR]: Unsupported data type for " + fileName);
 	        }
 
 	        System.out.println("[SUCCESS]: Data saved successfully");
-	    } catch (IOException e) {
+	    } catch (Exception e) {
 	        throw new FileProcessingException("[ERROR]: Failed to save data to " + fileName);
 	    }
 	}
@@ -42,7 +49,7 @@ public class JSONFileManager implements FileManager {
 	//Load all lines from the JSON file and return in to ArrayList
 	@Override
 	public Object loadData(String fileName) throws FileProcessingException {
-		ArrayList<String> lines = new ArrayList<>();
+		ArrayList<JSONObject> result = new ArrayList<>();
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileName))){
 			StringBuilder sb = new StringBuilder();
@@ -51,19 +58,23 @@ public class JSONFileManager implements FileManager {
 				sb.append(line);
 			}
 			
+			if(sb.length() ==0) {
+				System.out.println("[SUCCESS]: Data loaded successfully");
+				return result;
+			}
+			
 			JSONArray array = new JSONArray(sb.toString());
 			for(int i = 0; i < array.length(); i++) {
-				lines.add(array.getString(i));
+				result.add(array.getJSONObject(i));
 			}
 			
 			System.out.println("[SUCCESS]: Data loaded successfully");
 		} catch (Exception e) {
 	        throw new FileProcessingException("[ERROR]: Failed to load data from " + fileName);
-	    }
+	    } 
 
-	    return lines;
+	    return result;
 	}
-
 }
 
 
