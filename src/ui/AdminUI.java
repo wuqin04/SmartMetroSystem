@@ -8,10 +8,11 @@ import service.StationService;
 public class AdminUI {
 //Station portal
 	/*
+ 	int choice;
 
-	public void displayInfo() {
+	public void displayStationPortal() {
 		
-		int choice;
+		AdminUI stationPortal= new AdminUI();
 		
 		System.out.println("[STATION PORTAL]\n(Enter 1, 2 or 3 for station's options or 0 to return back to previous page.");
 		System.out.println("1. Add station");
