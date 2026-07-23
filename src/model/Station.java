@@ -38,6 +38,7 @@ public class Station {
 	}
 	
 	public void displayInfo() {
+		//No UI
 		int choice;
 		
 		System.out.println("[STATION PORTAL]\n(Enter 1, 2 or 3 for station's options or 0 to return back to previous page.");
