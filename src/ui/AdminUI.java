@@ -3,12 +3,15 @@ package ui;
 import java.util.Scanner;
 
 import model.Admin;
+import service.RouteService;
 
 public class AdminUI {
 	private Scanner sc;
+	private RouteService rs;
 	
-	public AdminUI(Scanner sc) {
+	public AdminUI(Scanner sc, RouteService rs) {
 		this.sc = sc;
+		this.rs = rs;
 	}
 	
 	public void loadDashboard(Admin admin) {
@@ -70,11 +73,10 @@ public class AdminUI {
 	        
 	        switch (choice) {
 	            case "1":
-	                // stationService logic here
+	                stationsMenu();
 	                break;
 	                
 	            case "2":
-	                // routeService logic here
 	            	routesMenu();
 	                break;
 	                
@@ -108,11 +110,13 @@ public class AdminUI {
 	        
 	        switch (choice) {
 	        case "1":
-	        	
+	        	// view routes method
+	        	rs.displayAllRoutes();
 	        	break;
 	        	
 	        case "2":
-	        	
+	        	// add routes method
+	        	rs.addRoute(Route);
 	        	break;
 	        	
 	        case "0":
@@ -123,7 +127,6 @@ public class AdminUI {
 	    		System.out.println("[ERROR]: Invalid input, please enter 0-2.");
 	    		break;
 	        }
-		}
-		
+		}		
 	}
 }

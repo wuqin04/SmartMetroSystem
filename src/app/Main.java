@@ -21,13 +21,16 @@ public class Main {
 		Ticket 				ticket;
 		Scanner 			sc 	   			= new Scanner(System.in);
 		FareCalculator 		fareCalculator 	= new FareCalculator();
+		
 		ArrayList<Ticket> 	tickets 		= new ArrayList<Ticket>();
 		ArrayList<Route>	routes			= new ArrayList<Route>();
+		
 		UserService 		us 				= new UserService();
 		TicketService 		ts				= new TicketService(tickets, fareCalculator);
 		RouteService		rs				= new RouteService(routes);
+		
 		PassengerUI 		passengerUI 	= new PassengerUI(sc, ts);
-		AdminUI 			adminUI			= new AdminUI(sc);
+		AdminUI 			adminUI			= new AdminUI(sc, rs);
 		
 		String choice = null;
 		
