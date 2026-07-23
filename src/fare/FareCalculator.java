@@ -1,5 +1,9 @@
 package fare;
 
-public class FareCalculator {
+import model.Route;
+import enums.TicketType;
 
+public interface FareCalculator {
+	
+	double calculateFare(Route route, TicketType ticketType);	
 }
