@@ -8,7 +8,6 @@ import service.StationService;
 
 public class Station {
 	
-	private int choiceS;
 	private String stationId;
 	private String name;
 	private String location;
@@ -16,8 +15,7 @@ public class Station {
 	
 	Scanner sc= new Scanner(System.in);	
 	
-	
-	
+	//Constructor
 	public void setStationId(String stationId) {
 		this.stationId=stationId;
 	}
@@ -26,29 +24,31 @@ public class Station {
 		this.name=name;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	
-	public String getLocation() {
-		return location;
-	}
-	
-	public String getStationId() {
-		return stationId;
-	}
-	
 	public void setLocation(String location) {
 		this.location=location;
 	}
 	
-	public void displayInfo() {
-		choiceS= stationPortal.choice;
-			 
-			
+	//Accessors
+	public String getName() {
+		return name;
+		}
 		
+	public String getLocation() {
+		return location;
+		}
+		
+	public String getStationId() {
+		return stationId;
+		}
+	
+	public void displayInfo() {
 		
 	}
+		
+		
+		
+		
+	
 	
 
 }
