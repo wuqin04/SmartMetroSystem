@@ -1,37 +1,54 @@
 package service;
-import java.util.Scanner;
+
 import model.Station;
 import java.util.ArrayList;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.io.PrintWriter;
+
 
 
 public class StationService {
 	
 	private ArrayList<Station> stations=new ArrayList<>();
-	Scanner sc= new Scanner(System.in);
+	
+	
 	
 	public void addStation(Station station) {
-	    stations.add(station); // keep the in-memory list too, if you still need it
+		
+				
+		//Check Station Name
+		boolean nameExists=false;
+		
+		for(Station s: stations) {
+			if(station.getName().equals(s.getName())) {
+				nameExists=true;
+				break;
+			}
+		}
+		
+		if(nameExists) {
+			System.out.println("[ERROR]: Station name has already exists. ");
+			return;
+		}
+		
+		if(!Character.isUpperCase(station.getName().trim().charAt(0))) {
+			System.out.println("[ERROR]: Each word of the station name does not start with capital letter. ");
+			return;
+		}
+		
+		//Generate Station ID
+		int stationA= stations.size()+1;
+		station.setStationId(String.format("Station%3d", stationA));
 
-	    try {
-	        FileWriter fw = new FileWriter("stations.txt", true); // true = append mode
-	        PrintWriter pw = new PrintWriter(fw);
+		//Save station info into the array
+		stations.add(station); 
 
-	        pw.println(station.getStationId() + "," + station.getName() + "," + station.getLocation());
-
-	        pw.close();
-	        System.out.println("[SUCCESS]: Station \"" + station.getName() + "\" has been added and saved to file.");
-
-	    } catch (IOException e) {
-	        System.out.println("[ERROR]: Could not save station to file.");
-	        e.printStackTrace();
-	    }
+		System.out.println("[SUCCESS]: Information of the station has added successfully.");
 	}
 	
 	
-	public Station searchStation() {
+	public Station searchStation(String name) {
+		
 		return null ;
 	}
 	/*
