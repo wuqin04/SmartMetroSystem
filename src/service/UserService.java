@@ -10,7 +10,7 @@ import exception.InvalidLoginException;
 public class UserService {
 	private HashMap<String, User> users = new HashMap<>();
 	
-	public void registerUser(User user) {
+	public void registerUser(User user){
 		
 		if (users.containsKey(user.getEmail())) {
 			throw new IllegalArgumentException("[ERROR]: Email is already registered.\n");

@@ -1,0 +1,10 @@
+[
+    {
+        "password": "123",
+        "role": "PASSENGER",
+        "balance": 0,
+        "name": "wuqin",
+        "userId": "USER1784958928121",
+        "email": "wuqin@gmail.com"
+    }
+]

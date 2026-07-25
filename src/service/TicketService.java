@@ -15,11 +15,11 @@ import exception.TicketNotFoundException;
 public class TicketService {
 
 	private ArrayList<Ticket> tickets;
-	private FareCalculator fareCalculator;
+	private StandardFareCalculator stdFareCalc;
 	
-	public TicketService(ArrayList<Ticket> tickets, FareCalculator fareCalculator) {
+	public TicketService(ArrayList<Ticket> tickets, StandardFareCalculator stdFareCalc) {
 		this.tickets = tickets;
-		this.fareCalculator= fareCalculator;
+		this.stdFareCalc= stdFareCalc;
 	}
 	
 	// Buy ticket function
@@ -44,7 +44,7 @@ public class TicketService {
 		Station destination = route.getDestination();
 
 		// fare calculator not create yet.
-		double ticketFare = fareCalculator.calculateFare(route, type);
+		double ticketFare = stdFareCalc.calculateFare(route, type);
 				
 		// Check passenger balance
 		if(passenger.getBalance() < ticketFare) {
