@@ -1,23 +1,28 @@
 package ui;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import enums.TicketType;
+import exception.TicketNotFoundException;
 import model.Passenger;
+import model.Route;
 import model.Station;
-import model.Ticket;
 import payment.Payment;
 import payment.CardPayment;
 import payment.CashPayment;
+import service.RouteService;
 import service.TicketService;
 
 public class PassengerUI {
 	private Scanner sc;
 	private TicketService ts;
+	private RouteService rs;
 	
-	public PassengerUI(Scanner sc, TicketService ts) {
+	public PassengerUI(Scanner sc, TicketService ts, RouteService rs) {
 		this.sc = sc;
 		this.ts = ts;
+		this.rs = rs;
 	}
 	
 	public void loadDashboard(Passenger passenger) {
@@ -178,7 +183,7 @@ public class PassengerUI {
 		    
 		    String ticketChoice = sc.nextLine();
 		    
-		    if (ticketChoice == "0") {
+		    if (ticketChoice.equals("0")) {
 		    	return;
 		    }
 		    
@@ -186,7 +191,8 @@ public class PassengerUI {
 		    TicketType selectedType = null;
 		    Station source = null;
 		    Station destination = null;
-		    Route route = null;
+		    ArrayList<Route> routes = null;
+		    double totalDistance = 0.0;
 		    double fare = 0.0;
 		    
 		    switch (ticketChoice) {
@@ -200,14 +206,21 @@ public class PassengerUI {
 		            System.out.print("Enter Destination Station: ");
 		            String destInput = sc.nextLine();
 		            
-		            // TODO: need Route and RouteService
-		            route = rs.findRoute(source, destination);
+		            try {
+		            	routes = (ArrayList<Route>) rs.findRoutes(source, destination);
+		            	for (Route route : routes) {
+		            		totalDistance += route.calculateDistance();
+		            		
+				            // TODO: Use StandardFareCalculator here later
+				            // current fare is just assumption without StandardFareCalculator
+				            fare = 5.00; 
+		            	}
+		            	
+		            } catch (IllegalArgumentException e) {
+		            	System.out.println("[ERROR]: " + e.getMessage());
+		            	continue;
+		            }   
 		            
-		            // TODO: Get real station object from stationService
-		            
-		            // TODO: Use StandardFareCalculator here later
-		            // current fare is just assumption without StandardFareCalculator
-		            fare = 5.00; 
 		            break;
 		            
 		        case "2":
@@ -239,51 +252,67 @@ public class PassengerUI {
 		        
 		        while (true) {
 		        	if (confirm.equalsIgnoreCase("Y")) {
-			            System.out.println("\n[PAYMENT METHOD]");
-			            System.out.println("1. Cash");
-			            System.out.println("2. Card");
-			            System.out.print("Enter your choice: ");
-			            
-			            String payOption = sc.nextLine();
-			            
-			            Payment paymentMethod = null;
-			            
-			            switch (payOption) {
-			            case "1":
-			            	paymentMethod = new CashPayment();
-			            	break;
-			            case "2":
-			            	System.out.println("Enter Card Number: ");
-			            	String cardNum = sc.nextLine();
-			            	paymentMethod = new CardPayment(cardNum);
-			            	break;
-			            default:
-			                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
-			                continue;
-			            }
-			            
-			            try {
-			                if (paymentMethod.pay(fare)) {
-			                    String ticketId = "T" + System.currentTimeMillis();
-			                    ts.buyTicket(passenger, route, selectedType);
-			                }
-			            } catch (IllegalArgumentException e) {
-			                System.out.println(e.getMessage()); 
-			            }
-			            
-			        } else {
-			            System.out.println("Purchase cancelled. Returning to menu...");
-			        }
-			    }
+		        		boolean paymentSuccess = false;
+		        		
+		        		while (!paymentSuccess) {
+		        			System.out.println("\n[PAYMENT METHOD]");
+				            System.out.println("1. Cash");
+				            System.out.println("2. Card");
+				            System.out.print("Enter your choice: ");
+				            
+				            String payOption = sc.nextLine();
+				            Payment paymentMethod = null;
+				            
+				            switch (payOption) {
+				            case "1":
+				            	paymentMethod = new CashPayment();
+				            	break;
+				            case "2":
+				            	System.out.println("Enter Card Number: ");
+				            	String cardNum = sc.nextLine();
+				            	paymentMethod = new CardPayment(cardNum);
+				            	break;
+				            default:
+				                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
+				                continue;
+				            }
+				            
+				            try {
+				                if (paymentMethod.pay(fare)) {
+				                	Route fullRoute = new Route("R-temp", source, destination, totalDistance);
+				                	
+				                    ts.buyTicket(passenger, fullRoute, selectedType);
+				                    
+				                    paymentSuccess = true;
+				                }
+				            } catch (IllegalArgumentException e) {
+				                System.out.println("[ERROR]: " + e.getMessage()); 
+				            }
+				            
+				        } 
+		        		
+		        	}
+		        	else {
+		        		System.out.println("Purchase cancelled. Returning to menu...");
+		        	}
+	        	}
 	        }   
-		}
-		
+	    }
 	}
 	
 	private void cancelTicketAction(Passenger passenger) {
+		System.out.println("\n[CANCEL TICKET]");
+	    
+	    viewTicketAction(passenger);
+	    
+	    System.out.println("Enter the Ticket ID you want to cancel: ");
+	    
+	    String ticketId = sc.nextLine();
+	    
 		try {
 			ts.cancelTicket(ticketId, passenger);
-		} catch (IllegalArgumentException e) {
+			System.out.println("[SUCCESS]: Ticket " + ticketId + " has been cancelled.");
+		} catch (IllegalArgumentException | TicketNotFoundException e) {
 			System.out.println(e.getMessage());
 		}
 	}

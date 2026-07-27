@@ -38,12 +38,12 @@ public class Main {
 		TicketService 				ts				= new TicketService(tickets, stdFareCalc);
 		RouteService				rs				= new RouteService(routes);
 		
-		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts);
+		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
 		AdminUI 					adminUI			= new AdminUI(sc, rs);
 		
 		String choice = null;
 		
-		while (!choice.equals("99")) {
+		while (choice != "99") {
 			System.out.println("\n[SMART METRO SYSTEM]");
 			System.out.println("(1)  Login ");
 			System.out.println("(2)  Register");
@@ -86,9 +86,6 @@ public class Main {
 		
 		System.out.print("Enter your password: ");
 		password = sc.nextLine();
-		
-		JSONFileManager jsonFM = new JSONFileManager();
-		String fileName = "data/users.json";
 		
 		try {
 			User loggedInUser = us.login(email, password);

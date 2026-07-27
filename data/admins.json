@@ -1,0 +1,10 @@
+[
+    {
+        "password": "999",
+        "role": "ADMIN",
+        "balance": 0,
+        "name": "admin",
+        "userId": "USER01",
+        "email": "admin@gmail.com"
+    }
+]
