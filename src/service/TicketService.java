@@ -25,7 +25,7 @@ public class TicketService {
 	private UserService userService;
 	private StationService stationService;
 	
-	public TicketService(ArrayList<Ticket> tickets, JSONFileManager fileManager, FareCalculator fareCalculator, String fileName, UserService userService,StationService stationService) throws FileProcessingException {
+	public TicketService(ArrayList<Ticket> tickets, JSONFileManager fileManager, FareCalculator fareCalculator, String fileName, UserService userService,StationService stationService){
 		
 		if(tickets == null) {
 			throw new IllegalArgumentException("[ERROR]: Tickets cannot be null or blank.");
@@ -197,7 +197,7 @@ public class TicketService {
 	    fileManager.saveData(ticketData, fileName);
 	}
 	
-	private void loadTickets() throws FileProcessingException{
+	private void loadTickets(){
 		Object loadedObject = fileManager.loadData(fileName);
 
 			if (loadedObject == null) {
@@ -250,7 +250,6 @@ public class TicketService {
 				} else if (status == TicketStatus.USED) {
 					ticket.useTicket();
 				}
-
 				tickets.add(ticket);
 			}
 	}
