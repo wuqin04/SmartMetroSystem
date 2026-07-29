@@ -9,21 +9,24 @@ import org.json.JSONObject;
 import exception.FileProcessingException;
 import payment.Payment;
 import repository.FileManager;
-import repository.JSONFileManager;
 
 public class PaymentService {
 
-    private static final String PAYMENT_FILE = "data/payments.json";
+	 private final FileManager jsonFileManager;
+	 private final String paymentFile;
+	 private final List<JSONObject> paymentHistory = new ArrayList<>();
 
-    private final FileManager jsonFileManager = new JSONFileManager();
-    private final List<JSONObject> paymentHistory = new ArrayList<>();
-
-    public PaymentService() {
+    public PaymentService(FileManager jsonFileManager, String paymentFile) {
+    	
+    	this.jsonFileManager = jsonFileManager;
+        this.paymentFile = paymentFile;
+        
         try {
             loadPaymentsFromJson();
         } catch (FileProcessingException e) {
             System.out.println("[INFO]: Starting with empty payment history.");
         }
+        
     }
 
     public boolean processPayment(Payment payment, double amount) {
@@ -44,7 +47,7 @@ public class PaymentService {
         if (paymentSuccessful) {
             JSONObject paymentRecord = new JSONObject();
             paymentRecord.put("paymentMethod",
-                payment.getClass().getSimpleName());
+            payment.getClass().getSimpleName());
             paymentRecord.put("amount", amount);
             paymentRecord.put("status", "SUCCESS");
             paymentRecord.put("paidAt", LocalDateTime.now().toString());
@@ -64,11 +67,11 @@ public class PaymentService {
     }
 
     private void savePaymentsToJson() throws FileProcessingException {
-        jsonFileManager.saveData(paymentHistory, PAYMENT_FILE);
+        jsonFileManager.saveData(paymentHistory, paymentFile);
     }
 
     private void loadPaymentsFromJson() throws FileProcessingException {
-        Object loadedData = jsonFileManager.loadData(PAYMENT_FILE);
+        Object loadedData = jsonFileManager.loadData(paymentFile);
 
         if (!(loadedData instanceof List<?>)) {
             throw new FileProcessingException(
