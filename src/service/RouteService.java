@@ -99,7 +99,7 @@ public final class RouteService {
         }
     }
     
-    public void saveRoutesToJson() throws FileProcessingException {
+    public void saveRoutes() throws FileProcessingException {
         List<JSONObject> jsonRoutes = new ArrayList<>();
 
         for (Route route : routes) {
@@ -122,11 +122,11 @@ public final class RouteService {
         jsonFileManager.saveData(jsonRoutes, routeFile);
     }
 
-    public void loadRoutesFromJson() throws FileProcessingException {
+    public void loadRoutes() throws FileProcessingException {
         Object loadedData = jsonFileManager.loadData(routeFile);
 
         if (!(loadedData instanceof List<?>)) {
-            throw new FileProcessingException("[ERROR]: Invalid JSON route data.");
+            throw new FileProcessingException("[ERROR]: Invalid JSON route data");
         }
 
         routes.clear();
@@ -162,7 +162,7 @@ public final class RouteService {
         routes.add(route);
 
         try {
-            saveRoutesToJson();
+            saveRoutes();
         } catch (FileProcessingException e) {
             throw new IllegalStateException("[ERROR]: Route added but could not be saved.");
         }
