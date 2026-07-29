@@ -35,11 +35,9 @@ public class UserService {
 		
 		this.fileManager = fileManager;
 		this.fileName = fileName;
-		
-		loadUsersIntoHashMap();
 	}
 	
-	private void loadUsersIntoHashMap() {
+	public void loadUsersIntoHashMap() {
 		
 		try {
 			Object loadedObject = fileManager.loadData(fileName);
@@ -173,5 +171,25 @@ public class UserService {
 			System.out.println(user);
 		}
 		System.out.println("----------------------------");
+	}
+	
+	public Passenger findPassengerById(String passengerId) {
+	
+		if (passengerId == null || passengerId.trim().isEmpty()) {
+
+				throw new IllegalArgumentException("[ERROR]: Passenger ID cannot be null or blank.");
+			}
+
+			String enteredId = passengerId.trim();
+
+			for (User user : users.values()) {
+
+				if (user instanceof Passenger && user.getUserId().equalsIgnoreCase(enteredId)) {
+
+					return (Passenger) user;
+				}
+			}
+
+			throw new IllegalArgumentException("[ERROR]: Passenger ID not found: " + enteredId);
 	}
 }	
