@@ -173,7 +173,7 @@ public class TicketService {
 		}
 	}
 	
-	private void saveTickets() throws FileProcessingException {
+	public void saveTickets() throws FileProcessingException {
 
 	    List<JSONObject> ticketData = new ArrayList<>();
 

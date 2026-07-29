@@ -21,12 +21,6 @@ public class PaymentService {
     	this.jsonFileManager = jsonFileManager;
         this.paymentFile = paymentFile;
         
-        try {
-            loadPaymentsFromJson();
-        } catch (FileProcessingException e) {
-            System.out.println("[INFO]: Starting with empty payment history.");
-        }
-        
     }
 
     public boolean processPayment(Payment payment, double amount) {
@@ -55,7 +49,7 @@ public class PaymentService {
             paymentHistory.add(paymentRecord);
 
             try {
-                savePaymentsToJson();
+                savePayments();
             } catch (FileProcessingException e) {
                 throw new IllegalStateException(
                     "[ERROR]: Payment succeeded but could not be saved."
@@ -66,11 +60,11 @@ public class PaymentService {
         return paymentSuccessful;
     }
 
-    private void savePaymentsToJson() throws FileProcessingException {
+    public void savePayments() throws FileProcessingException {
         jsonFileManager.saveData(paymentHistory, paymentFile);
     }
 
-    private void loadPaymentsFromJson() throws FileProcessingException {
+    public void loadPayments() throws FileProcessingException {
         Object loadedData = jsonFileManager.loadData(paymentFile);
 
         if (!(loadedData instanceof List<?>)) {
