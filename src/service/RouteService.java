@@ -126,7 +126,7 @@ public final class RouteService {
         Object loadedData = jsonFileManager.loadData(routeFile);
 
         if (!(loadedData instanceof List<?>)) {
-            throw new FileProcessingException("[ERROR]: Invalid JSON route data.");
+            throw new FileProcessingException("[ERROR]: Invalid JSON route data");
         }
 
         routes.clear();
