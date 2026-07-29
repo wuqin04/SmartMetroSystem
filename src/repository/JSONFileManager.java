@@ -40,7 +40,6 @@ public class JSONFileManager implements FileManager {
 	            throw new FileProcessingException("[ERROR]: Unsupported data type for " + fileName);
 	        }
 
-	        System.out.println("[SUCCESS]: Data saved successfully");
 	    } catch (Exception e) {
 	        throw new FileProcessingException("[ERROR]: Failed to save data to " + fileName);
 	    }
@@ -59,7 +58,6 @@ public class JSONFileManager implements FileManager {
 			}
 			
 			if(sb.length() ==0) {
-				System.out.println("[SUCCESS]: Data loaded successfully");
 				return result;
 			}
 			
@@ -68,7 +66,6 @@ public class JSONFileManager implements FileManager {
 				result.add(array.getJSONObject(i));
 			}
 			
-			System.out.println("[SUCCESS]: Data loaded successfully");
 		} catch (Exception e) {
 	        throw new FileProcessingException("[ERROR]: Failed to load data from " + fileName);
 	    } 
