@@ -85,7 +85,7 @@ public class TicketService {
 				
 		// Check passenger balance
 		if(passenger.getBalance() < ticketFare) {
-			throw new IllegalArgumentException("[ERROR]: Passenger has insufficient balance");
+			throw new IllegalArgumentException("[ERROR]: Passenger has insufficient balance.");
 		}
 		
 		// Create ticket 
