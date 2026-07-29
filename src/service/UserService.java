@@ -29,7 +29,7 @@ public class UserService {
 
 		if (fileName == null || fileName.trim().isEmpty()) {
 			throw new IllegalArgumentException(
-				"[ERROR]: File name cannot be null or blank"
+				"[ERROR]: File name cannot be null or blank."
 			);
 		}
 		
