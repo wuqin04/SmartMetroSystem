@@ -23,7 +23,7 @@ public class UserService {
 		
 		if (fileManager == null) {
 			throw new IllegalArgumentException(
-				"[ERROR]: JSON file manager cannot be null."
+				"[ERROR]: JSON file manager cannot be null"
 			);
 		}
 
