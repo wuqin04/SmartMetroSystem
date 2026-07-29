@@ -57,10 +57,7 @@ public class UserService {
 		users.put(emailKey, user);
 
 		try {
-			List<User> userList = new ArrayList<>(users.values());
-
-			fileManager.saveData(userList, fileName);
-
+			saveUsers();
 		} catch (FileProcessingException e) {
 
 			users.remove(emailKey);
@@ -174,8 +171,11 @@ public class UserService {
 		}
 	}
 	
-	public void saveUsers() {
+	public void saveUsers() throws FileProcessingException {
 		
+		List<User> userList = new ArrayList<>(users.values());	
+		
+		fileManager.saveData(userList, fileName);
 	}
 	
 	public Passenger findPassengerById(String passengerId) {
