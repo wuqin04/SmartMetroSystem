@@ -37,7 +37,79 @@ public class UserService {
 		this.fileName = fileName;
 	}
 	
-	public void loadUsersIntoHashMap() {
+	
+	// --- REGISTER ---
+	public void registerUser(User user) throws FileProcessingException {
+		
+		if(user == null) {
+			throw new IllegalArgumentException("[ERROR]: User cannot be null.");
+		}
+		
+		if(user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+			throw new IllegalArgumentException("User email cannot be null.");
+		}
+		String emailKey = user.getEmail().trim().toLowerCase(Locale.ROOT);
+		
+		if (users.containsKey(emailKey)) {
+			throw new IllegalArgumentException("[ERROR]: Email is already registered.\n");
+		}
+		
+		users.put(emailKey, user);
+
+		try {
+			saveUsers();
+		} catch (FileProcessingException e) {
+
+			users.remove(emailKey);
+			throw e;
+		}
+	}
+		
+	// --- LOGIN ---
+	public User login(String email, String password) throws InvalidLoginException {
+		
+		loadUsers();
+		
+		if(email == null || email.trim().isEmpty()) {
+			throw new InvalidLoginException("[ERROR]: Invalid email.");
+		}
+		
+		if(password == null || password.trim().isEmpty()) {
+			throw new InvalidLoginException("[ERROR]: Invalid password.");
+		}
+		
+		String emailKey = email.trim().toLowerCase(Locale.ROOT);
+		User foundUser = users.get(emailKey);
+		
+		if(foundUser == null){
+			throw new InvalidLoginException("[ERROR]: Invalid email or password.");
+		}
+		
+		boolean isSuccess = foundUser.login(foundUser.getEmail(), password);
+		
+		if (!isSuccess) {
+			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.");
+		}
+		
+		return foundUser;
+	}
+	
+	// --- VIEW ALL ---
+	public void viewAllUsers() {
+		System.out.println("\n--- ALL REGISTERED USERS ---");
+		
+		if(users.isEmpty()){
+			System.out.println("No registered users found.");
+			System.out.println("----------------------------");
+			return;
+		}
+		for (User user : users.values()) {
+			System.out.println(user);
+		}
+		System.out.println("----------------------------");
+	}
+	
+	public void loadUsers() {
 		
 		try {
 			Object loadedObject = fileManager.loadData(fileName);
@@ -100,77 +172,11 @@ public class UserService {
 		}
 	}
 	
-	// --- REGISTER ---
-	public void registerUser(User user) throws FileProcessingException {
+	public void saveUsers() throws FileProcessingException {
 		
-		if(user == null) {
-			throw new IllegalArgumentException("[ERROR]: User cannot be null.");
-		}
+		List<User> userList = new ArrayList<>(users.values());	
 		
-		if(user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-			throw new IllegalArgumentException("User email cannot be null.");
-		}
-		String emailKey = user.getEmail().trim().toLowerCase(Locale.ROOT);
-		
-		if (users.containsKey(emailKey)) {
-			throw new IllegalArgumentException("[ERROR]: Email is already registered.\n");
-		}
-		
-		users.put(emailKey, user);
-
-		try {
-			List<User> userList = new ArrayList<>(users.values());
-
-			fileManager.saveData(userList, fileName);
-
-		} catch (FileProcessingException e) {
-
-			users.remove(emailKey);
-			throw e;
-		}
-	}
-	
-	// --- LOGIN ---
-	public User login(String email, String password) throws InvalidLoginException {
-		// Because we loaded the data in the constructor, we just check the HashMap!
-		
-		if(email == null || email.trim().isEmpty()) {
-			throw new InvalidLoginException("[ERROR]: Invalid email.\n");
-		}
-		
-		if(password == null || password.trim().isEmpty()) {
-			throw new InvalidLoginException("[ERROR]: Invalid password.\n");
-		}
-		
-		String emailKey = email.trim().toLowerCase(Locale.ROOT);
-		User foundUser = users.get(emailKey);
-		
-		if(foundUser == null){
-			throw new InvalidLoginException("[ERROR]: Invalid email or password.");
-		}
-		
-		boolean isSuccess = foundUser.login(foundUser.getEmail(), password);
-		
-		if (!isSuccess) {
-			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.\n");
-		}
-		
-		return foundUser;
-	}
-	
-	// --- VIEW ALL ---
-	public void viewAllUsers() {
-		System.out.println("\n--- ALL REGISTERED USERS ---");
-		
-		if(users.isEmpty()){
-			System.out.println("No registered users found.");
-			System.out.println("----------------------------");
-			return;
-		}
-		for (User user : users.values()) {
-			System.out.println(user);
-		}
-		System.out.println("----------------------------");
+		fileManager.saveData(userList, fileName);
 	}
 	
 	public Passenger findPassengerById(String passengerId) {
