@@ -67,16 +67,15 @@ public class UserService {
 		
 	// --- LOGIN ---
 	public User login(String email, String password) throws InvalidLoginException {
-		// Because we loaded the data in the constructor, we just check the HashMap!
 		
 		loadUsers();
 		
 		if(email == null || email.trim().isEmpty()) {
-			throw new InvalidLoginException("[ERROR]: Invalid email.\n");
+			throw new InvalidLoginException("[ERROR]: Invalid email.");
 		}
 		
 		if(password == null || password.trim().isEmpty()) {
-			throw new InvalidLoginException("[ERROR]: Invalid password.\n");
+			throw new InvalidLoginException("[ERROR]: Invalid password.");
 		}
 		
 		String emailKey = email.trim().toLowerCase(Locale.ROOT);
@@ -89,7 +88,7 @@ public class UserService {
 		boolean isSuccess = foundUser.login(foundUser.getEmail(), password);
 		
 		if (!isSuccess) {
-			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.\n");
+			throw new InvalidLoginException("[ERROR]: Invalid login credentials, check your password or email.");
 		}
 		
 		return foundUser;
