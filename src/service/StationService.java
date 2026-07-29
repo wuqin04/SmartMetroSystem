@@ -1,16 +1,16 @@
 package service;
 
-import model.Passenger;
-import model.Station;
-import model.User;
-
 import java.util.ArrayList;
 
-import java.io.IOException;
+import model.Station;
 
 public class StationService {
 	
 	private ArrayList<Station> stations=new ArrayList<>();
+	
+	public ArrayList<Station> getAllStations() {
+		return stations;
+	}
 	
 	public void addStation(Station station) {
 				
@@ -46,15 +46,36 @@ public class StationService {
 	
 	
 	public Station searchStation(String name) {
+		if (name == null || name.trim().isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: Name cannot be null.");
+		}
 		
-		return null ;
+		String searchName = name.trim();
+		
+		for (Station station : stations) {
+			if (station.getName().equalsIgnoreCase(searchName)) {
+				return station;
+			}
+		}
+		return null;
 	}
 	
-	/*
 	public void viewStations() {
-		
-	}
-	*/
+        System.out.println("\n[ALL REGISTERED STATIONS]");
+        
+        if (stations == null || stations.isEmpty()) {
+            System.out.println("[INFO]: No stations currently exist in the system.");
+            System.out.println("---------------------------------");
+            return;
+        }
+        
+        for (Station station : stations) {
+            System.out.println("Station ID : " + station.getStationId());
+            System.out.println("Name       : " + station.getName());
+            System.out.println("Location   : " + station.getLocation());
+            System.out.println("---------------------------------");
+        }
+    }
 	
 	public Station findStationById(String stationId) {
 		

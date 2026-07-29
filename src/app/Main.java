@@ -23,7 +23,6 @@ public class Main {
 	public static void main(String[] args) {
 		JSONFileManager 			jsonFM			= new JSONFileManager();
 		String 						userFile		= "data/users.json";
-		String						adminFile  		= "data/admins.json";
 		String 						ticketFile		= "data/tickets.json";
 		String 						routeFile		= "data/routes.json";
 		String 						paymentFile		= "data/payments.json";
@@ -40,19 +39,23 @@ public class Main {
 		TicketService 				ts				= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, us, ss);
 		RouteService				rs				= new RouteService(routes, jsonFM, routeFile);
 
+		us.loadUsers();
+		rs.loadRoutes();
+		ts.loadTickets();
+		
 		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
-		AdminUI 					adminUI			= new AdminUI(sc, rs);
+		AdminUI 					adminUI			= new AdminUI(sc, rs, ss, routes);
 		
-		String choice = null;
+		String choice = "";
 		
-		while (choice != "99") {
+		while (!choice.equals("99")) {
 			System.out.println("\n[SMART METRO SYSTEM]");
 			System.out.println("(1)  Login ");
 			System.out.println("(2)  Register");
 			System.out.println("(99) Exit Program ");
 			System.out.print("Enter your choice: ");
 			
-			choice = sc.nextLine();
+			choice = sc.nextLine().trim();
 			
 			switch (choice) {
 			case "1":
@@ -77,65 +80,70 @@ public class Main {
 	}
 	
 	public static void loginMenu(Scanner sc, UserService us, PassengerUI passengerUI, AdminUI adminUI) {
-		// temp information
-		String email;
-		String password;
 		
 		System.out.println("\n[LOGIN PAGE]");
+		System.out.println("Enter 99 to return to the main menu.");
 		
-		System.out.print("Enter your email: ");
-		email = sc.nextLine();
+		boolean isSuccess = false;
 		
-		System.out.print("Enter your password: ");
-		password = sc.nextLine();
-		
-		try {
-			User loggedInUser = us.login(email, password);
+		while (!isSuccess) {
+			System.out.print("Enter your email: ");
+			String email = sc.nextLine();
 			
-			System.out.printf("[SUCCESS]: Welcome back, %s!\n", loggedInUser.getName());
+			if (email.equalsIgnoreCase("99")) {
+				return;
+			}
 			
-			if (loggedInUser.getRole() == UserRole.PASSENGER) {
-				passengerUI.loadDashboard((Passenger)loggedInUser);
+			System.out.print("Enter your password: ");
+			String password = sc.nextLine().trim();
+			
+			if (password.equalsIgnoreCase("99")) {
+				return;	
 			}
-			else if (loggedInUser.getRole() == UserRole.ADMIN) {
-				adminUI.loadDashboard((Admin)loggedInUser);
+			
+			try {
+				User loggedInUser = us.login(email, password);
+				isSuccess = true;
+				
+				System.out.printf("[SUCCESS]: Welcome back, %s!\n", loggedInUser.getName());
+				
+				if (loggedInUser.getRole() == UserRole.PASSENGER) {
+					passengerUI.loadDashboard((Passenger)loggedInUser);
+				}
+				else if (loggedInUser.getRole() == UserRole.ADMIN) {
+					adminUI.loadDashboard((Admin)loggedInUser);
+				}
+			} catch (InvalidLoginException e) {
+				System.out.println("Login Failed!\n" + e.getMessage());
+				System.out.println("Please try again.\n");
 			}
-		} catch (InvalidLoginException e) {
-			System.out.print("Login Failed!\n" + e.getMessage());
 		}
 	}
 	
 	public static void registerMenu(Scanner sc, UserService us) {
-		// temp information
-		String userId;
-		String name;
-		String email;
-		String password;
-		
-		Passenger passenger;
 		
 		System.out.println("\n[REGISTER PAGE]");
 		
 		System.out.print("Create your name: ");
-		name = sc.nextLine();
+		String name = sc.nextLine().trim();
 		
 		System.out.print("Enter your email: ");
-		email = sc.nextLine();
+		String email = sc.nextLine().trim();
 		
 		System.out.print("Create your password: ");
-		password = sc.nextLine();
+		String password = sc.nextLine().trim();
 		
-		userId = "USER" + System.currentTimeMillis();
+		String userId = "USER" + System.currentTimeMillis();
 		
 		try {
-			passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0);
+			Passenger passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0);
 			us.registerUser(passenger);
 						
 			System.out.println("[SUCCESS]: Register successfully!");
 		} catch (IllegalArgumentException e) {
 			System.out.print("Register Failed!\n" + e.getMessage());
 		} catch (Exception e) {
-			System.out.println("Register Failed!\n[ERROR]: " + e.getMessage());
+			System.out.println("Register Failed!\n" + e.getMessage());
 		}
 	}
 }
