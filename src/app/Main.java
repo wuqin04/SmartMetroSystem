@@ -27,6 +27,11 @@ public class Main {
 	public static void main(String[] args) {
 		JSONFileManager 			jsonFM			= new JSONFileManager();
 		String 						userFile		= "data/users.json";
+		String						adminFile  		= "data/admins.json";
+		String 						ticketFile		= "data/tickets.json";
+		String 						routeFile		= "data/routes.json";
+		String 						paymentFile		= "data/payments.json";
+		String 						stationFile		= "data/stations.json";
 		
 		Scanner 					sc 	   			= new Scanner(System.in);
 		StandardFareCalculator 		stdFareCalc 	= new StandardFareCalculator();
@@ -38,6 +43,7 @@ public class Main {
 		TicketService 				ts				= new TicketService(tickets, stdFareCalc);
 		RouteService				rs				= new RouteService(routes);
 		
+
 		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
 		AdminUI 					adminUI			= new AdminUI(sc, rs);
 		
@@ -130,7 +136,7 @@ public class Main {
 			us.registerUser(passenger);
 						
 			System.out.println("[SUCCESS]: Register successfully!");
-		} catch (IllegalArgumentException | FileProcessingException e) {
+		} catch (IllegalArgumentException e) {
 			System.out.print("Register Failed!\n" + e.getMessage());
 		} catch (Exception e) {
 			System.out.println("Register Failed!\n[ERROR]: " + e.getMessage());

@@ -1,0 +1,12 @@
+[
+  {
+    "routeId": "R001",
+    "distanceKm": 12.5,
+    "sourceStationId": "S001",
+    "sourceName": "Kajang",
+    "sourceLocation": "Kajang, Selangor",
+    "destinationStationId": "S002",
+    "destinationName": "Bukit Bintang",
+    "destinationLocation": "Kuala Lumpur"
+  }
+]
