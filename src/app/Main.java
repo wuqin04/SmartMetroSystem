@@ -1,9 +1,7 @@
 package app;
 
 import java.util.Scanner;
-import org.json.JSONObject;
 import java.util.ArrayList;
-import java.util.List;
 
 import ui.PassengerUI;
 import ui.AdminUI;
@@ -12,16 +10,13 @@ import model.User;
 import model.Admin;
 import model.Passenger;
 import model.Route;
-import fare.FareCalculator;
 import fare.StandardFareCalculator;
 import enums.UserRole;
-import repository.FileManager;
 import repository.JSONFileManager;
 import service.UserService;
 import service.TicketService;
 import service.RouteService;
 import service.StationService;
-import exception.FileProcessingException;
 import exception.InvalidLoginException;
 
 public class Main {
@@ -43,7 +38,7 @@ public class Main {
 		StationService				ss				= new StationService();
 		UserService 				us 				= new UserService(jsonFM, userFile);
 		TicketService 				ts				= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, us, ss);
-		RouteService				rs				= new RouteService(routes);
+		RouteService				rs				= new RouteService(routes, jsonFM, routeFile);
 
 		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
 		AdminUI 					adminUI			= new AdminUI(sc, rs);
