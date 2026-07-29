@@ -64,10 +64,12 @@ public class UserService {
 			throw e;
 		}
 	}
-	
+		
 	// --- LOGIN ---
 	public User login(String email, String password) throws InvalidLoginException {
 		// Because we loaded the data in the constructor, we just check the HashMap!
+		
+		loadUsers();
 		
 		if(email == null || email.trim().isEmpty()) {
 			throw new InvalidLoginException("[ERROR]: Invalid email.\n");
