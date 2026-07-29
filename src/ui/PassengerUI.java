@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import enums.TicketType;
+import exception.FileProcessingException;
 import exception.TicketNotFoundException;
 import model.Passenger;
 import model.Route;
@@ -281,7 +282,11 @@ public class PassengerUI {
 				                if (paymentMethod.pay(fare)) {
 				                	Route fullRoute = new Route("R-temp", source, destination, totalDistance);
 				                	
-				                    ts.buyTicket(passenger, fullRoute, selectedType);
+				                    try {
+										ts.buyTicket(passenger, fullRoute, selectedType);
+									} catch (FileProcessingException e) {
+										System.out.println(e.getMessage());
+									}
 				                    
 				                    paymentSuccess = true;
 				                }
@@ -310,7 +315,11 @@ public class PassengerUI {
 	    String ticketId = sc.nextLine();
 	    
 		try {
-			ts.cancelTicket(ticketId, passenger);
+			try {
+				ts.cancelTicket(ticketId, passenger);
+			} catch (FileProcessingException e) {
+				System.out.println(e.getMessage());
+			}
 			System.out.println("[SUCCESS]: Ticket " + ticketId + " has been cancelled.");
 		} catch (IllegalArgumentException | TicketNotFoundException e) {
 			System.out.println(e.getMessage());

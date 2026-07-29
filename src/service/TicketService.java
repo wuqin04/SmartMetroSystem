@@ -57,8 +57,6 @@ public class TicketService {
 		this.userService = userService;
 		this.fileManager = fileManager;
 		this.stationService = stationService;
-		
-		loadTickets();
 	}
 	
 	// Buy ticket function
@@ -175,7 +173,7 @@ public class TicketService {
 		}
 	}
 	
-	private void saveTickets() throws FileProcessingException {
+	public void saveTickets() throws FileProcessingException {
 
 	    List<JSONObject> ticketData = new ArrayList<>();
 
@@ -197,7 +195,7 @@ public class TicketService {
 	    fileManager.saveData(ticketData, fileName);
 	}
 	
-	private void loadTickets(){
+	public void loadTickets() throws FileProcessingException{
 		Object loadedObject = fileManager.loadData(fileName);
 
 			if (loadedObject == null) {

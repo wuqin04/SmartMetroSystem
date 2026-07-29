@@ -35,72 +35,8 @@ public class UserService {
 		
 		this.fileManager = fileManager;
 		this.fileName = fileName;
-		
-		loadUsersIntoHashMap();
 	}
 	
-	private void loadUsersIntoHashMap() {
-		
-		try {
-			Object loadedObject = fileManager.loadData(fileName);
-			
-			if(loadedObject == null) {
-				return;
-			}
-			
-			if(!(loadedObject instanceof List<?>)) {
-				throw new IllegalStateException("[ERROR]: Invalid user file format.");
-			}
-			
-			List<?> loadedData = (List<?>) loadedObject;	
-			
-			for (Object obj : loadedData) {
-				JSONObject jsonObj;
-				if (obj instanceof JSONObject) {
-					jsonObj = (JSONObject) obj;
-				} else {
-					jsonObj = new JSONObject(obj);
-				}
-				
-				// Extract data from JSON
-				String userId = jsonObj.getString("userId");
-				String name = jsonObj.getString("name");
-				String email = jsonObj.getString("email");
-				String password = jsonObj.getString("password");
-				
-				// accept "Admin, "admin", " ADMIN"
-				String roleText = jsonObj.getString("role").trim().toUpperCase(Locale.ROOT);
-				UserRole role = UserRole.valueOf(roleText); 
-				
-				User user;
-				// Rebuild the correct object type
-				if (role == UserRole.PASSENGER) {
-					double balance = jsonObj.optDouble("balance", 0.0);
-					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance);
-				} else if(role == UserRole.ADMIN){
-					user = new Admin(userId, name, email, password);
-				} else {
-					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
-				}
-				
-				String emailKey = email.trim().toLowerCase(Locale.ROOT);
-				
-				if(users.containsKey(emailKey)) {
-					throw new IllegalStateException("[ERROR]: Duplicate email found in user file: " + email);
-				}
-				
-				// Put the user into the lecturer's HashMap
-				users.put(emailKey, user);
-			}
-			
-		} catch (FileProcessingException e) {
-			// If the file doesn't exist yet, it just means no users are registered.
-			// The HashMap stays empty, which is perfectly fine.
-			System.out.println("[INFO]: No existing users found. Starting fresh.");
-		} catch (RuntimeException e) {
-			throw new IllegalStateException("[ERROR]: Unable to load user data from " + fileName + ".", e);
-		}
-	}
 	
 	// --- REGISTER ---
 	public void registerUser(User user) throws FileProcessingException {
@@ -173,6 +109,93 @@ public class UserService {
 			System.out.println(user);
 		}
 		System.out.println("----------------------------");
+	}
+	
+	public void loadUsers() {
+		
+		try {
+			Object loadedObject = fileManager.loadData(fileName);
+			
+			if(loadedObject == null) {
+				return;
+			}
+			
+			if(!(loadedObject instanceof List<?>)) {
+				throw new IllegalStateException("[ERROR]: Invalid user file format.");
+			}
+			
+			List<?> loadedData = (List<?>) loadedObject;	
+			
+			for (Object obj : loadedData) {
+				JSONObject jsonObj;
+				if (obj instanceof JSONObject) {
+					jsonObj = (JSONObject) obj;
+				} else {
+					jsonObj = new JSONObject(obj);
+				}
+				
+				// Extract data from JSON
+				String userId = jsonObj.getString("userId");
+				String name = jsonObj.getString("name");
+				String email = jsonObj.getString("email");
+				String password = jsonObj.getString("password");
+				
+				// accept "Admin, "admin", " ADMIN"
+				String roleText = jsonObj.getString("role").trim().toUpperCase(Locale.ROOT);
+				UserRole role = UserRole.valueOf(roleText); 
+				
+				User user;
+				// Rebuild the correct object type
+				if (role == UserRole.PASSENGER) {
+					double balance = jsonObj.optDouble("balance", 0.0);
+					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance);
+				} else if(role == UserRole.ADMIN){
+					user = new Admin(userId, name, email, password);
+				} else {
+					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
+				}
+				
+				String emailKey = email.trim().toLowerCase(Locale.ROOT);
+				
+				if(users.containsKey(emailKey)) {
+					throw new IllegalStateException("[ERROR]: Duplicate email found in user file: " + email);
+				}
+				
+				// Put the user into the lecturer's HashMap
+				users.put(emailKey, user);
+			}
+			
+		} catch (FileProcessingException e) {
+			// If the file doesn't exist yet, it just means no users are registered.
+			// The HashMap stays empty, which is perfectly fine.
+			System.out.println("[INFO]: No existing users found. Starting fresh.");
+		} catch (RuntimeException e) {
+			throw new IllegalStateException("[ERROR]: Unable to load user data from " + fileName + ".", e);
+		}
+	}
+	
+	public void saveUsers() {
+		
+	}
+	
+	public Passenger findPassengerById(String passengerId) {
+	
+		if (passengerId == null || passengerId.trim().isEmpty()) {
+
+				throw new IllegalArgumentException("[ERROR]: Passenger ID cannot be null or blank.");
+			}
+
+			String enteredId = passengerId.trim();
+
+			for (User user : users.values()) {
+
+				if (user instanceof Passenger && user.getUserId().equalsIgnoreCase(enteredId)) {
+
+					return (Passenger) user;
+				}
+			}
+
+			throw new IllegalArgumentException("[ERROR]: Passenger ID not found: " + enteredId);
 	}
 }	
 	

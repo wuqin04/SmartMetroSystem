@@ -1,6 +1,9 @@
 package service;
 
+import model.Passenger;
 import model.Station;
+import model.User;
+
 import java.util.ArrayList;
 
 import java.io.IOException;
@@ -46,10 +49,29 @@ public class StationService {
 		
 		return null ;
 	}
-	6
+	
 	/*
 	public void viewStations() {
 		
 	}
 	*/
+	
+	public Station findStationById(String stationId) {
+		
+		if(stationId == null || stationId.trim().isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: Source ID cannot be null.");
+		}
+		
+		String enteredId = stationId.trim();
+
+		for (Station station: stations) {
+
+			if (station.getStationId().equalsIgnoreCase(enteredId)) {
+
+				return station;
+			}
+		}
+
+		throw new IllegalArgumentException("[ERROR]: Station ID not found: " + enteredId);
+	}
 }
