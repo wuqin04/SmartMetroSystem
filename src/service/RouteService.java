@@ -8,29 +8,24 @@ import org.json.JSONObject;
 
 import exception.FileProcessingException;
 import repository.FileManager;
-import repository.JSONFileManager;
 
 import model.Route;
 import model.Station;
 
 public final class RouteService {
     private ArrayList<Route> routes;
-    private final FileManager jsonFileManager = new JSONFileManager();
-    private static final String ROUTE_FILE = "data/routes.json";
+    private final FileManager jsonFileManager;
+    private final String routeFile;
  
-    public RouteService(ArrayList<Route> routes) {
+    public RouteService(ArrayList<Route> routes, FileManager jsonFileManager, String routeFile) {
         if (routes == null) {
             throw new IllegalArgumentException("[ERROR]: Routes list cannot be null.");
         }
-
+ 
         this.routes = routes;
-
-        try {
-            loadRoutesFromJson(ROUTE_FILE);
-        } catch (FileProcessingException e) {
-            System.out.println("[INFO]: Starting with empty route data.");
-        }
-    }
+        this.jsonFileManager = jsonFileManager;
+        this.routeFile = routeFile;
+    	}
  
     /**
      * Finds a sequence of routes connecting the requested source and destination,
@@ -104,7 +99,7 @@ public final class RouteService {
         }
     }
     
-    public void saveRoutesToJson(String fileName) throws FileProcessingException {
+    public void saveRoutesToJson() throws FileProcessingException {
         List<JSONObject> jsonRoutes = new ArrayList<>();
 
         for (Route route : routes) {
@@ -124,11 +119,11 @@ public final class RouteService {
             jsonRoutes.add(jsonRoute);
         }
 
-        jsonFileManager.saveData(jsonRoutes, fileName);
+        jsonFileManager.saveData(jsonRoutes, routeFile);
     }
 
-    public void loadRoutesFromJson(String fileName) throws FileProcessingException {
-        Object loadedData = jsonFileManager.loadData(fileName);
+    public void loadRoutesFromJson() throws FileProcessingException {
+        Object loadedData = jsonFileManager.loadData(routeFile);
 
         if (!(loadedData instanceof List<?>)) {
             throw new FileProcessingException("[ERROR]: Invalid JSON route data.");
@@ -167,7 +162,7 @@ public final class RouteService {
         routes.add(route);
 
         try {
-            saveRoutesToJson(ROUTE_FILE);
+            saveRoutesToJson();
         } catch (FileProcessingException e) {
             throw new IllegalStateException("[ERROR]: Route added but could not be saved.");
         }
