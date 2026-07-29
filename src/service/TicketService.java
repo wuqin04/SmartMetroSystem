@@ -1,29 +1,66 @@
 package service;
+
 import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONObject;
 import enums.TicketType;
+import enums.TicketStatus;
 import enums.UserRole;
+import repository.JSONFileManager;
 import fare.FareCalculator;
-import fare.StandardFareCalculator;
 import model.Ticket;
 import model.Passenger;
 import model.Route;
 import model.Station;
 import model.User;
+import exception.FileProcessingException;
 import exception.TicketNotFoundException;
-
 
 public class TicketService {
 
 	private ArrayList<Ticket> tickets;
-	private StandardFareCalculator stdFareCalc;
+	private FareCalculator fareCalculator;
+	private JSONFileManager fileManager;
+	private String fileName;
+	private UserService userService;
+	private StationService stationService;
 	
-	public TicketService(ArrayList<Ticket> tickets, StandardFareCalculator stdFareCalc) {
+	public TicketService(ArrayList<Ticket> tickets, JSONFileManager fileManager, FareCalculator fareCalculator, String fileName, UserService userService,StationService stationService){
+		
+		if(tickets == null) {
+			throw new IllegalArgumentException("[ERROR]: Tickets cannot be null or blank.");
+		}
+		
+		if(fareCalculator == null) {
+			throw new IllegalArgumentException("[ERROR]: Fare calculator cannot be null or blank.");
+		}
+		
+		if(fileName == null || fileName.trim().isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: File name cannot be null or blank.");
+		}
+		
+		if(userService == null) {
+			throw new IllegalArgumentException("[ERROR]: User service cannot be null or blank.");
+		}
+		
+		if(fileManager == null) {
+			throw new IllegalArgumentException("[ERROR]: Json file cannot be null or blank.");
+		}
+		
+		if(stationService == null) {
+			throw new IllegalArgumentException("[ERROR]: Station service cannot be null or blank.");
+		}
+		
 		this.tickets = tickets;
-		this.stdFareCalc= stdFareCalc;
+		this.fareCalculator =  fareCalculator;
+		this.fileName = fileName.trim();
+		this.userService = userService;
+		this.fileManager = fileManager;
+		this.stationService = stationService;
 	}
 	
 	// Buy ticket function
-	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) {
+	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) throws FileProcessingException{
 		if(passenger == null) {
 			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null or blank.");
 		}
@@ -38,13 +75,13 @@ public class TicketService {
 		
 		// Generate ticket ID
 		int ticketNumber = tickets.size() + 1;
-		String generatedId = String.format("T%3d", ticketNumber);
+		String generatedId = String.format("T%03d", ticketNumber);
 		
 		Station source = route.getSource();
 		Station destination = route.getDestination();
 
 		// fare calculator not create yet.
-		double ticketFare = stdFareCalc.calculateFare(route, type);
+		double ticketFare = fareCalculator.calculateFare(route, type);
 				
 		// Check passenger balance
 		if(passenger.getBalance() < ticketFare) {
@@ -57,12 +94,19 @@ public class TicketService {
 		
 		// Add the ticket into the ArrayList
 		tickets.add(ticket);
+		try {
+			saveTickets();
+		}catch(FileProcessingException e){
+			tickets.remove(ticket);
+			throw e;
+		}
+		
 		System.out.printf("[SUCCESS]: Ticket purchase successful! Remaining Balance: RM%.2f\n", passenger.getBalance());
 		
 		return ticket;
 	}
 	
-	public void cancelTicket(String ticketId, Passenger passenger) throws TicketNotFoundException {
+	public void cancelTicket(String ticketId, Passenger passenger) throws TicketNotFoundException, FileProcessingException {
 		
 		if(ticketId == null || ticketId.trim().isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Ticket ID cannot be null or empty.");
@@ -81,9 +125,10 @@ public class TicketService {
 				
 				if(ticket.getPassenger().getUserId().equals(passenger.getUserId())) {
 					ticket.cancelTicket();
+					saveTickets();
 					return;
 				}
-				throw new IllegalArgumentException("[ERROR]: Ticket does not belongs to passenger" + passenger.getUserId() + ".");
+				throw new IllegalArgumentException("[ERROR]: Ticket does not belong to passenger" + passenger.getUserId() + ".");
 			}
 		}
 		throw new TicketNotFoundException("[ERROR]: Ticket ID not found.");
@@ -120,11 +165,90 @@ public class TicketService {
 			}
 			
 			if(!ticketFound) {
-				throw new IllegalArgumentException("[ERROR]: Passenger has no tickets.");
+				System.out.println("[ERROR]: Passenger has no tickets.");
 			} 
 			
 		} else {
 			throw new IllegalArgumentException("[ERROR]: Invalid user role.");
 		}
+	}
+	
+	private void saveTickets() throws FileProcessingException {
+
+	    List<JSONObject> ticketData = new ArrayList<>();
+
+	    for (Ticket ticket : tickets) {
+
+	        JSONObject jsonTicket = new JSONObject();
+
+	        jsonTicket.put("ticket Id", ticket.getTicketId());
+	        jsonTicket.put("passenger Id",ticket.getPassenger().getUserId());
+	        jsonTicket.put("source Id",ticket.getSource().getStationId());
+	        jsonTicket.put("destination Id",ticket.getDestination().getStationId());
+	        jsonTicket.put("ticket type",ticket.getTicketType().name());
+	        jsonTicket.put("ticket status",ticket.getStatus().name());
+	        jsonTicket.put("fare", ticket.getFare());
+
+	        ticketData.add(jsonTicket);
+	    }
+
+	    fileManager.saveData(ticketData, fileName);
+	}
+	
+	public void loadTickets() throws FileProcessingException{
+		Object loadedObject = fileManager.loadData(fileName);
+
+			if (loadedObject == null) {
+				return;
+			}
+
+			if (!(loadedObject instanceof List<?>)) {
+				throw new IllegalStateException("[ERROR]: Invalid ticket file format.");
+			}
+
+			List<?> loadedData = (List<?>) loadedObject;
+
+			tickets.clear();
+
+			for (Object obj : loadedData) {
+
+				JSONObject jsonTicket;
+
+				if (obj instanceof JSONObject) {
+					jsonTicket = (JSONObject) obj;
+				} else {
+					jsonTicket = new JSONObject(obj);
+				}
+
+				String ticketId = jsonTicket.getString("ticket Id");
+
+				String passengerId = jsonTicket.getString("passenger Id");
+
+				String sourceId = jsonTicket.getString("source Id");
+
+				String destinationId = jsonTicket.getString("destination Id");
+
+				TicketType ticketType = TicketType.valueOf(jsonTicket.getString("ticket type"));
+
+				TicketStatus status = TicketStatus.valueOf(jsonTicket.getString("ticket status"));
+
+				double fare = jsonTicket.getDouble("fare");
+
+				Passenger passenger = userService.findPassengerById(passengerId);
+
+				Station source = stationService.findStationById(sourceId);
+
+				Station destination = stationService.findStationById(destinationId);
+
+				Ticket ticket = new Ticket(ticketId, passenger, source, destination, ticketType, fare);
+
+				if (status == TicketStatus.CANCELLED) {
+					ticket.cancelTicket();
+
+				} else if (status == TicketStatus.USED) {
+					ticket.useTicket();
+				}
+				tickets.add(ticket);
+			}
 	}
 }

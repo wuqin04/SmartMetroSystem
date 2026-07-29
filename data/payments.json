@@ -1,6 +1,8 @@
 [
   {
-    "paymentMethod": "CashPayment",
+    "paymentId" : "PAY001",
+	"passengerId" : "U001",
+	"paymentMethod": "CashPayment",
     "amount": 20,
     "status": "SUCCESS",
     "paidAt": "2026-07-27T14:30:00"
