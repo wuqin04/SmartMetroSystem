@@ -5,13 +5,9 @@ import java.util.ArrayList;
 
 import java.io.IOException;
 
-
-
 public class StationService {
 	
 	private ArrayList<Station> stations=new ArrayList<>();
-	
-	
 	
 	public void addStation(Station station) {
 				

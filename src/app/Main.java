@@ -20,6 +20,7 @@ import repository.JSONFileManager;
 import service.UserService;
 import service.TicketService;
 import service.RouteService;
+import service.StationService;
 import exception.FileProcessingException;
 import exception.InvalidLoginException;
 
@@ -39,10 +40,10 @@ public class Main {
 		ArrayList<Ticket> 			tickets 		= new ArrayList<Ticket>();
 		ArrayList<Route>			routes			= new ArrayList<Route>();
 		
-		UserService 				us 				= new UserService();
-		TicketService 				ts				= new TicketService(tickets, stdFareCalc);
+		StationService				ss				= new StationService();
+		UserService 				us 				= new UserService(jsonFM, userFile);
+		TicketService 				ts				= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, us, ss);
 		RouteService				rs				= new RouteService(routes);
-		
 
 		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
 		AdminUI 					adminUI			= new AdminUI(sc, rs);
