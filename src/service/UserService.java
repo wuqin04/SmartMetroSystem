@@ -19,11 +19,7 @@ public class UserService {
 	private JSONFileManager fileManager;
 	private String fileName;
 	
-	private StationService stationService;
-	private TrainService trainService;
-	private ReportService reportService;
-	
-	public UserService(JSONFileManager fileManager, String fileName, StationService stationService, TrainService trainService, ReportService reportService) {
+	public UserService(JSONFileManager fileManager, String fileName) {
 		
 		if (fileManager == null) {
 			throw new IllegalArgumentException(
@@ -36,30 +32,9 @@ public class UserService {
 				"[ERROR]: File name cannot be null or blank."
 			);
 		}
-
-		if (stationService == null) {
-			throw new IllegalArgumentException(
-				"[ERROR]: Station service cannot be null."
-			);
-		}
-
-		if (trainService == null) {
-			throw new IllegalArgumentException(
-				"[ERROR]: Train service cannot be null."
-			);
-		}
-
-		if (reportService == null) {
-			throw new IllegalArgumentException(
-				"[ERROR]: Report service cannot be null."
-			);
-		}
 		
 		this.fileManager = fileManager;
 		this.fileName = fileName;
-		this.stationService = stationService;
-		this.trainService = trainService;
-		this.reportService = reportService;
 		
 		loadUsersIntoHashMap();
 	}
@@ -101,9 +76,9 @@ public class UserService {
 				// Rebuild the correct object type
 				if (role == UserRole.PASSENGER) {
 					double balance = jsonObj.optDouble("balance", 0.0);
-					user = new Passenger(userId, name, email, password, UserRole.PASSENGER	, balance);
+					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance);
 				} else if(role == UserRole.ADMIN){
-					user = new Admin(userId, name, email, password, stationService, trainService, reportService);
+					user = new Admin(userId, name, email, password);
 				} else {
 					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
 				}
