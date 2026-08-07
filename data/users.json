@@ -1,8 +1,20 @@
-[{
-    "password": "123",
-    "role": "PASSENGER",
-    "balance": 0,
-    "name": "wuqin",
-    "userId": "USER1785292947679",
-    "email": "wuqin@gmail.com"
-}]
+[
+	{
+		"userId": "USER1786096422569",
+		"name": "wuqin",
+		"email": "wuqin@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0
+	}
+,
+	{
+		"userId": "USER1786096437063",
+		"name": "serene",
+		"email": "serene@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0
+	}
+
+]

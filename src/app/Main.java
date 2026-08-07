@@ -5,28 +5,38 @@ import java.util.ArrayList;
 
 import ui.PassengerUI;
 import ui.AdminUI;
+
 import model.Ticket;
 import model.User;
 import model.Admin;
 import model.Passenger;
 import model.Route;
+
 import fare.StandardFareCalculator;
+
 import enums.UserRole;
-import repository.JSONFileManager;
+
+import repository.JsonFileManager;
+
 import service.UserService;
 import service.TicketService;
+import service.TrainService;
+import service.PaymentService;
 import service.RouteService;
 import service.StationService;
+
 import exception.InvalidLoginException;
 
 public class Main {
 	public static void main(String[] args) {
-		JSONFileManager 			jsonFM			= new JSONFileManager();
+		JsonFileManager 			jsonFM			= new JsonFileManager();
+		
+		String 						stationFile		= "data/stations.json";
 		String 						userFile		= "data/users.json";
 		String 						ticketFile		= "data/tickets.json";
 		String 						routeFile		= "data/routes.json";
+		String						trainFile		= "data/trains.json";
 		String 						paymentFile		= "data/payments.json";
-		String 						stationFile		= "data/stations.json";
 		
 		Scanner 					sc 	   			= new Scanner(System.in);
 		StandardFareCalculator 		stdFareCalc 	= new StandardFareCalculator();
@@ -34,17 +44,23 @@ public class Main {
 		ArrayList<Ticket> 			tickets 		= new ArrayList<Ticket>();
 		ArrayList<Route>			routes			= new ArrayList<Route>();
 		
-		StationService				ss				= new StationService();
-		UserService 				us 				= new UserService(jsonFM, userFile);
-		TicketService 				ts				= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, us, ss);
-		RouteService				rs				= new RouteService(routes, jsonFM, routeFile);
-
-		us.loadUsers();
-		rs.loadRoutes();
-		ts.loadTickets();
+		StationService				stationService  = new StationService(jsonFM, stationFile);
+		UserService 				userService     = new UserService(jsonFM, userFile);
+		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, userService, stationService);
+		RouteService				routeService	= new RouteService(routes, jsonFM, routeFile);
+		TrainService                trainService    = new TrainService(jsonFM, trainFile); 
+		PaymentService              paymentService  = new PaymentService(jsonFM, paymentFile);
 		
-		PassengerUI 				passengerUI 	= new PassengerUI(sc, ts, rs);
-		AdminUI 					adminUI			= new AdminUI(sc, rs, ss, routes);
+		// load all data
+		stationService.loadStations();
+		userService.loadUsers();
+		trainService.loadTrains();
+		paymentService.loadPayments();
+		routeService.loadRoutes();  
+		ticketService.loadTickets();
+		
+		PassengerUI 				passengerUI 	= new PassengerUI(sc, ticketService, routeService);
+		AdminUI 					adminUI			= new AdminUI(sc, routeService, stationService, routes);
 		
 		String choice = "";
 		
@@ -59,11 +75,11 @@ public class Main {
 			
 			switch (choice) {
 			case "1":
-				loginMenu(sc, us, passengerUI, adminUI);
+				loginMenu(sc, userService, passengerUI, adminUI);
 				break;
 				
 			case "2":
-				registerMenu(sc, us);
+				registerMenu(sc, userService);
 				break;
 				
 			case "99":

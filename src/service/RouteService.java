@@ -1,10 +1,7 @@
-//add or edit route infos
 package service;
  
 import java.util.ArrayList;
 import java.util.List;
-
-import org.json.JSONObject;
 
 import exception.FileProcessingException;
 import repository.FileManager;
@@ -12,7 +9,9 @@ import repository.FileManager;
 import model.Route;
 import model.Station;
 
-public final class RouteService {
+import util.JsonUtil;
+
+public class RouteService {
     private ArrayList<Route> routes;
     private final FileManager jsonFileManager;
     private final String routeFile;
@@ -100,62 +99,96 @@ public final class RouteService {
     }
     
     public void saveRoutes() throws FileProcessingException {
-        List<JSONObject> jsonRoutes = new ArrayList<>();
-
-        for (Route route : routes) {
-            JSONObject jsonRoute = new JSONObject();
-
-            jsonRoute.put("routeId", route.getRouteId());
-            jsonRoute.put("distanceKm", route.getDistanceKm());
-
-            jsonRoute.put("sourceStationId", route.getSource().getStationId());
-            jsonRoute.put("sourceName", route.getSource().getName());
-            jsonRoute.put("sourceLocation", route.getSource().getLocation());
-
-            jsonRoute.put("destinationStationId", route.getDestination().getStationId());
-            jsonRoute.put("destinationName", route.getDestination().getName());
-            jsonRoute.put("destinationLocation", route.getDestination().getLocation());
-
-            jsonRoutes.add(jsonRoute);
-        }
-
-        jsonFileManager.saveData(jsonRoutes, routeFile);
-    }
-
-    public void loadRoutes() throws FileProcessingException {
-        Object loadedData = jsonFileManager.loadData(routeFile);
-
-        if (!(loadedData instanceof List<?>)) {
-            throw new FileProcessingException("[ERROR]: Invalid JSON route data");
-        }
-
-        routes.clear();
-
-        for (Object item : (List<?>) loadedData) {
-            JSONObject jsonRoute = (JSONObject) item;
-
-            Station source = new Station(
-            	    jsonRoute.getString("sourceStationId"),
-            	    jsonRoute.getString("sourceName"),
-            	    jsonRoute.getString("sourceLocation")
-            	);
-
-            	Station destination = new Station(
-            	    jsonRoute.getString("destinationStationId"),
-            	    jsonRoute.getString("destinationName"),
-            	    jsonRoute.getString("destinationLocation")
-            	);
-
-            Route route = new Route(
-                jsonRoute.getString("routeId"),
-                source,
-                destination,
-                jsonRoute.getDouble("distanceKm")
-            );
-
-            routes.add(route);
+    	String jsonString = "[\n";
+    	
+    	for (int i = 0; i < routes.size(); i++) {
+    		Route route = routes.get(i);
+    		
+    		jsonString += """
+	    				{
+	    					"routeId": "%s",
+			                "distanceKm": %s,
+			                "sourceStationId": "%s",
+			                "sourceName": "%s",
+			                "sourceLocation": "%s",
+			                "destinationStationId": "%s",
+			                "destinationName": "%s",
+			                "destinationLocation": "%s"
+	    				}
+    				""".formatted(
+    						route.getRouteId(),
+		                      route.getDistanceKm(),
+		                      route.getSource().getStationId(),
+		                      route.getSource().getName(),
+		                      route.getSource().getLocation(),
+		                      route.getDestination().getStationId(),
+		                      route.getDestination().getName(),
+		                      route.getDestination().getLocation()
+    						);
+    		
+    		if (i < routes.size() - 1) {
+    			jsonString += ",\n";
+    		}
+    		else {
+    			jsonString += "\n";
+    		}
+    	}
+    	
+    	jsonString += "]";
+    	
+    	try {
+            jsonFileManager.saveData(jsonString, routeFile);
+        } catch (FileProcessingException e) {
+            System.out.println("[ERROR]: Critical failure while saving routes to " + routeFile);
+            throw e;
         }
     }
+
+    public void loadRoutes() {
+        try {
+        	Object loadedObject = jsonFileManager.loadData(routeFile);
+        	
+        	if (loadedObject == null) return;
+        	
+        	String jsonString = String.valueOf(loadedObject).trim(); 
+        	
+        	if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
+            
+            routes.clear();
+            
+            String[] routeBlocks = jsonString.split("}");
+            
+            for (String block : routeBlocks) {
+                if (block.trim().isEmpty() || block.trim().equals("]")) {
+                    continue;
+                }
+                
+                String routeId = JsonUtil.extractString(block, "routeId");
+                double distanceKm = JsonUtil.extractNumber(block, "distanceKm");
+                
+                String sourceStationId = JsonUtil.extractString(block, "sourceStationId");
+                String sourceName = JsonUtil.extractString(block, "sourceName");
+                String sourceLocation = JsonUtil.extractString(block, "sourceLocation");
+                
+                String destinationStationId = JsonUtil.extractString(block, "destinationStationId");
+                String destinationName = JsonUtil.extractString(block, "destinationName");
+                String destinationLocation = JsonUtil.extractString(block, "destinationLocation");
+                
+                Station source = new Station(sourceStationId, sourceName, sourceLocation);
+                Station destination = new Station(destinationStationId, destinationName, destinationLocation);
+                
+                Route route = new Route(routeId, source, destination, distanceKm);
+                
+                routes.add(route);
+            }
+       
+        } catch (FileProcessingException e) {
+        	System.out.println("[INFO]: Creating new data.");
+        } catch (Exception e) {
+        	throw new IllegalStateException("[ERROR]: Unable to load route data from " + routeFile + ".", e);
+        }
+    }
+    
     public void addRoute(Route route) {
         if (route == null) {
             throw new IllegalArgumentException("[ERROR]: Route cannot be null.");

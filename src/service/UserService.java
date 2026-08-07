@@ -3,23 +3,23 @@ package service;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONObject;
 import java.util.Locale;
 import model.User;
 import model.Passenger;
 import model.Admin;
 import enums.UserRole;
-import repository.JSONFileManager;
+import repository.JsonFileManager;
+import util.JsonUtil;
 import exception.InvalidLoginException;
 import exception.FileProcessingException;
 
 public class UserService {
 
 	private HashMap<String, User> users = new HashMap<>();
-	private JSONFileManager fileManager;
+	private JsonFileManager fileManager;
 	private String fileName;
 	
-	public UserService(JSONFileManager fileManager, String fileName) {
+	public UserService(JsonFileManager fileManager, String fileName) {
 		
 		if (fileManager == null) {
 			throw new IllegalArgumentException(
@@ -68,8 +68,6 @@ public class UserService {
 	// --- LOGIN ---
 	public User login(String email, String password) throws InvalidLoginException {
 		
-		loadUsers();
-		
 		if(email == null || email.trim().isEmpty()) {
 			throw new InvalidLoginException("[ERROR]: Invalid email.");
 		}
@@ -110,63 +108,50 @@ public class UserService {
 	}
 	
 	public void loadUsers() {
-		
 		try {
 			Object loadedObject = fileManager.loadData(fileName);
 			
-			if(loadedObject == null) {
-				return;
-			}
+			if (loadedObject == null) return;
 			
-			if(!(loadedObject instanceof List<?>)) {
-				throw new IllegalStateException("[ERROR]: Invalid user file format.");
-			}
+			String jsonString = String.valueOf(loadedObject).trim();
 			
-			List<?> loadedData = (List<?>) loadedObject;	
+        	if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
+        	
+        	users.clear();
+        	
+			String[] userBlocks = jsonString.split("}");
 			
-			for (Object obj : loadedData) {
-				JSONObject jsonObj;
-				if (obj instanceof JSONObject) {
-					jsonObj = (JSONObject) obj;
-				} else {
-					jsonObj = new JSONObject(obj);
-				}
+			for (String block : userBlocks) {
+				if (block.trim().isEmpty() || block.trim().equals("]")) continue;
 				
-				// Extract data from JSON
-				String userId = jsonObj.getString("userId");
-				String name = jsonObj.getString("name");
-				String email = jsonObj.getString("email");
-				String password = jsonObj.getString("password");
+				String userId = JsonUtil.extractString(block, "userId");
+				String name = JsonUtil.extractString(block, "name");
+				String email = JsonUtil.extractString(block, "email");
+				String password = JsonUtil.extractString(block, "password");
 				
-				// accept "Admin, "admin", " ADMIN"
-				String roleText = jsonObj.getString("role").trim().toUpperCase(Locale.ROOT);
+				String roleText = JsonUtil.extractString(block, "role").toUpperCase(Locale.ROOT);
 				UserRole role = UserRole.valueOf(roleText); 
 				
 				User user;
-				// Rebuild the correct object type
 				if (role == UserRole.PASSENGER) {
-					double balance = jsonObj.optDouble("balance", 0.0);
+					double balance = JsonUtil.extractNumber(block, "balance");
 					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance);
-				} else if(role == UserRole.ADMIN){
+				} else if (role == UserRole.ADMIN) {
 					user = new Admin(userId, name, email, password);
 				} else {
 					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
 				}
 				
 				String emailKey = email.trim().toLowerCase(Locale.ROOT);
-				
-				if(users.containsKey(emailKey)) {
-					throw new IllegalStateException("[ERROR]: Duplicate email found in user file: " + email);
+				if (users.containsKey(emailKey)) {
+					throw new IllegalStateException("[ERROR]: Duplicate email found.");
 				}
 				
-				// Put the user into the lecturer's HashMap
 				users.put(emailKey, user);
 			}
 			
 		} catch (FileProcessingException e) {
-			// If the file doesn't exist yet, it just means no users are registered.
-			// The HashMap stays empty, which is perfectly fine.
-			System.out.println("[INFO]: No existing users found. Starting fresh.");
+			System.out.println("[INFO]: Creating new data.");
 		} catch (RuntimeException e) {
 			throw new IllegalStateException("[ERROR]: Unable to load user data from " + fileName + ".", e);
 		}
@@ -174,9 +159,51 @@ public class UserService {
 	
 	public void saveUsers() throws FileProcessingException {
 		
-		List<User> userList = new ArrayList<>(users.values());	
+		String jsonString = "[\n";
 		
-		fileManager.saveData(userList, fileName);
+		List<User> userList = new ArrayList<>(users.values());
+		
+		for (int i = 0; i < userList.size(); i++) {
+			User user = userList.get(i);
+			
+			if (user.getRole() == UserRole.PASSENGER) {
+				Passenger p = (Passenger) user;
+				
+				jsonString += """
+							{
+								"userId": "%s",
+								"name": "%s",
+								"email": "%s",
+								"password": "%s",
+								"role": "%s",
+								"balance": %s
+							}
+						""".formatted(
+								p.getUserId(),
+								p.getName(),
+								p.getEmail(),
+								p.getPassword(),
+								p.getRole(),
+								p.getBalance()
+								);
+			}
+			
+			if (i < userList.size() - 1) {
+				jsonString += ",\n";
+			}
+			else {
+				jsonString += "\n";
+			}
+		}
+		
+		jsonString += "]";
+		
+		try {
+			fileManager.saveData(jsonString, fileName);
+		} catch (FileProcessingException e) {
+			System.out.println("[ERROR]: Critical failure while saving users to" + fileName);
+			throw e;
+		}
 	}
 	
 	public Passenger findPassengerById(String passengerId) {
