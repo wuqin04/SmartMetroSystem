@@ -134,15 +134,17 @@ public final class RouteService {
         for (Object item : (List<?>) loadedData) {
             JSONObject jsonRoute = (JSONObject) item;
 
-            Station source = new Station();
-            source.setStationId(jsonRoute.getString("sourceStationId"));
-            source.setName(jsonRoute.getString("sourceName"));
-            source.setLocation(jsonRoute.getString("sourceLocation"));
+            Station source = new Station(
+            	    jsonRoute.getString("sourceStationId"),
+            	    jsonRoute.getString("sourceName"),
+            	    jsonRoute.getString("sourceLocation")
+            	);
 
-            Station destination = new Station();
-            destination.setStationId(jsonRoute.getString("destinationStationId"));
-            destination.setName(jsonRoute.getString("destinationName"));
-            destination.setLocation(jsonRoute.getString("destinationLocation"));
+            	Station destination = new Station(
+            	    jsonRoute.getString("destinationStationId"),
+            	    jsonRoute.getString("destinationName"),
+            	    jsonRoute.getString("destinationLocation")
+            	);
 
             Route route = new Route(
                 jsonRoute.getString("routeId"),
