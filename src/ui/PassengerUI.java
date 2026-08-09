@@ -68,7 +68,8 @@ public class PassengerUI {
 			System.out.println("\n[PROFILE MANAGEMENT]");
 			
             System.out.println("(1) View Profile");
-            System.out.println("(2) Top Up Balance");
+            System.out.println("(2) Edit Profile");
+            System.out.println("(3) Top Up Balance");
             System.out.println("(0) Back to Dashboard");
             System.out.print("Enter your choice: ");
             
@@ -110,7 +111,7 @@ public class PassengerUI {
                 back = true; 
                 break;
             default:
-                System.out.println("[ERROR]: Invalid choice. Enter 0-2 only");
+                System.out.println("[ERROR]: Invalid choice. Enter 0-3 only");
             }
 		}
 	}
@@ -218,7 +219,7 @@ public class PassengerUI {
 		            	}
 		            	
 		            } catch (IllegalArgumentException e) {
-		            	System.out.println("[ERROR]: " + e.getMessage());
+		            	System.out.println(e.getMessage());
 		            	continue;
 		            }   
 		            

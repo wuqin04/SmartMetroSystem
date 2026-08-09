@@ -1,5 +1,14 @@
 [
 	{
+		"userId": "ADMIN001",
+		"name": "Sasuke",
+		"email": "admin@gmail.com",
+		"password": "admin",
+		"role": "ADMIN",
+		"balance": 0.0
+	}	
+,
+	{
 		"userId": "USER1786096422569",
 		"name": "wuqin",
 		"email": "wuqin@gmail.com",
