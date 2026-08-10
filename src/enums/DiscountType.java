@@ -5,5 +5,6 @@ public enum DiscountType {
 
 	OKU,
 	SENIOR,
-	STUDENT;
+	STUDENT,
+	NONE;
 }
