@@ -1,6 +1,7 @@
 package fare;
 
 import enums.TicketType;
+import enums.DiscountType;
 import model.Route;
 
 public class StandardFareCalculator implements FareCalculator {
@@ -11,7 +12,7 @@ public class StandardFareCalculator implements FareCalculator {
 	private static final double MONTHLY_FARE = 50.00;
 
 	@Override
-	public double calculateFare(Route route, TicketType ticketType) {
+	public double calculateFare(Route route, TicketType ticketType, DiscountType discountType) {
 		
 		if(route == null) {
 			throw new IllegalArgumentException("[ERROR]: Route cannot be null.");
@@ -19,6 +20,10 @@ public class StandardFareCalculator implements FareCalculator {
 		
 		if(ticketType == null) {
 			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null.");
+		}
+		
+		if(discountType == null) {
+			throw new IllegalArgumentException("[ERROR]: Discount type cannot be null.");
 		}
 		
 		double distance = route.calculateDistance();
@@ -37,6 +42,13 @@ public class StandardFareCalculator implements FareCalculator {
 			fare = MONTHLY_FARE; 
 		}else {
 			throw new IllegalArgumentException("[ERROR]: Invalid ticket type.");
+		}
+		
+		if(ticketType == TicketType.SINGLE) {
+			
+			if(discountType == DiscountType.STUDENT || discountType == DiscountType.OKU|| discountType == DiscountType.SENIOR) {
+				fare /= 2;
+			}
 		}
 		
 		double finalFare = Math.round(fare * 100.0) / 100.0;
