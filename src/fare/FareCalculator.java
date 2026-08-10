@@ -1,7 +1,6 @@
 package fare;
 
 import model.Route;
-import model.Passenger;
 import enums.TicketType;
 import enums.DiscountType;
 
