@@ -47,7 +47,7 @@ public class StandardFareCalculator implements FareCalculator {
 		if(ticketType == TicketType.SINGLE) {
 			
 			if(discountType == DiscountType.STUDENT || discountType == DiscountType.OKU|| discountType == DiscountType.SENIOR) {
-				fare /= 3;
+				fare /= 2;
 			}
 		}
 		
