@@ -1,6 +1,7 @@
 package service;
 
 import java.util.HashMap;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +36,8 @@ public class UserService {
 		
 		this.fileManager = fileManager;
 		this.fileName = fileName;
+		
+		loadUsers();
 	}
 	
 	
@@ -131,11 +134,15 @@ public class UserService {
 				
 				String roleText = JsonUtil.extractString(block, "role").toUpperCase(Locale.ROOT);
 				UserRole role = UserRole.valueOf(roleText); 
-				
+			
 				User user;
 				if (role == UserRole.PASSENGER) {
 					double balance = JsonUtil.extractNumber(block, "balance");
-					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance);
+					
+					String dateOfBirthText = JsonUtil.extractString(block, "dateOfBirth"); 
+					LocalDate dateOfBirth = LocalDate.parse(dateOfBirthText);
+					
+					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance, dateOfBirth);
 				} else if (role == UserRole.ADMIN) {
 					user = new Admin(userId, name, email, password);
 				} else {
@@ -177,6 +184,7 @@ public class UserService {
 								"password": "%s",
 								"role": "%s",
 								"balance": %s
+								"date of birth": "%s"
 							}
 						""".formatted(
 								p.getUserId(),
@@ -184,7 +192,8 @@ public class UserService {
 								p.getEmail(),
 								p.getPassword(),
 								p.getRole(),
-								p.getBalance()
+								p.getBalance(),
+								p.getDateOfBirth()
 								);
 			}
 			

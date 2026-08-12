@@ -1,21 +1,17 @@
 package service;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import enums.TicketType;
 import enums.TicketStatus;
 import enums.UserRole;
-
+import enums.DiscountType;
 import repository.FileManager;
 import fare.FareCalculator;
-
 import model.Ticket;
 import model.Passenger;
 import model.Route;
 import model.Station;
 import model.User;
-
 import exception.FileProcessingException;
 import exception.TicketNotFoundException;
 import util.JsonUtil; // <-- Imported your new Utility class
@@ -24,12 +20,14 @@ public class TicketService {
 
 	private final ArrayList<Ticket> tickets;
 	private final FareCalculator fareCalculator;
+	private final DiscountEligibilityService discountEligibilityService;
 	private final FileManager fileManager;
 	private final String fileName;
 	private final UserService userService;
 	private final StationService stationService;
 	
-	public TicketService(ArrayList<Ticket> tickets, FileManager fileManager, FareCalculator fareCalculator, String fileName, UserService userService, StationService stationService) {
+	public TicketService(ArrayList<Ticket> tickets, FileManager fileManager, FareCalculator fareCalculator, 
+						DiscountEligibilityService discountEligibilityService, String fileName, UserService userService, StationService stationService) {
 		
 		if (tickets == null) {
 			throw new IllegalArgumentException("[ERROR]: Tickets cannot be null or blank.");
@@ -41,6 +39,10 @@ public class TicketService {
 		
 		if (fileName == null || fileName.trim().isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: File name cannot be null or blank.");
+		}
+		
+		if (discountEligibilityService == null) {
+			throw new IllegalArgumentException("[ERROR]: Discount eligibility service cannot be null.");
 		}
 		
 		if (userService == null) {
@@ -57,10 +59,12 @@ public class TicketService {
 		
 		this.tickets = tickets;
 		this.fareCalculator = fareCalculator;
+		this.discountEligibilityService = discountEligibilityService;
 		this.fileName = fileName.trim();
 		this.userService = userService;
 		this.fileManager = fileManager;
 		this.stationService = stationService;
+		
 	}
 
 	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) throws FileProcessingException{
@@ -82,9 +86,11 @@ public class TicketService {
 		
 		Station source = route.getSource();
 		Station destination = route.getDestination();
+		
+		DiscountType discountType = discountEligibilityService.determineDiscountType(passenger);
 
-		// fare calculator not create yet.
-		double ticketFare = fareCalculator.calculateFare(route, type);
+		// Calculate final fare based on ticket type and passenger eligibility.
+		double ticketFare = fareCalculator.calculateFare(route, type, discountType);
 				
 		// Check passenger balance
 		if (passenger.getBalance() < ticketFare) {
@@ -100,10 +106,12 @@ public class TicketService {
 		
 		try {
 			saveTickets();
+			userService.saveUsers();
 			System.out.printf("[SUCCESS]: Ticket purchase successful! Remaining Balance: RM%.2f\n", passenger.getBalance());
 			return ticket;
 		} catch (FileProcessingException e){
 			tickets.remove(ticket);
+			passenger.topUp(ticketFare);
 			throw new IllegalStateException("[ERROR]: Ticket purchased but could not be saved to file.", e);
 		}
 	}
