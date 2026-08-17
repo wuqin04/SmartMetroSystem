@@ -1,9 +1,11 @@
 package model;
 
 import enums.UserRole;
+import java.time.LocalDate;
 
 public class Passenger extends User {
 	private double balance;
+	private LocalDate dateOfBirth;
 	
 	public void topUp(double amount) {
 		if (amount <= 0) {
@@ -21,14 +23,14 @@ public class Passenger extends User {
 		double fare = ticket.getFare();
 		
 		if (fare <= 0 ) {
-			throw new IllegalArgumentException("[ERROR]: Ticket fare must be greather than 0.");
+			throw new IllegalArgumentException("[ERROR]: Ticket fare must be greater than 0.");
 		}
 		
 		if (this.balance < fare) {
 			throw new IllegalArgumentException(String.format("[ERROR]: Insufficient balance. You need RM%.2f but only have RM%.2f ", fare, this.balance));
 		}
 		
-		this.balance -= ticket.getFare();
+		this.balance -= fare;
 	}
 	
 	public void viewProfile() {
@@ -42,8 +44,19 @@ public class Passenger extends User {
 		return balance;
 	}
 	
-	public Passenger(String userId, String name, String email, String password, UserRole role, double balance) {
+	public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+	
+	public Passenger(String userId, String name, String email, String password, UserRole role, double balance, LocalDate dateOfBirth) {
 		super(userId, name, email, password, role);
 		this.balance = balance;
+		
+		if(dateOfBirth == null) {
+			throw new IllegalArgumentException("[ERROR]: Date of birth cannot be null or blank.");
+		} else if(dateOfBirth.isAfter(LocalDate.now())) {
+			throw new IllegalArgumentException("[ERROR]: Date of birth cannot be in the future.");
+		}
+		this.dateOfBirth = dateOfBirth;
 	}
 }

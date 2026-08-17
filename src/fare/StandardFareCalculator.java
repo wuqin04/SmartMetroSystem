@@ -6,10 +6,10 @@ import model.Route;
 
 public class StandardFareCalculator implements FareCalculator {
 	
-	private static final double BASE_FARE = 1.00;
-	private static final double RATE_PER_KM = 0.60;
-	private static final double DAILY_FARE = 10.00;
-	private static final double MONTHLY_FARE = 50.00;
+	private final double BASE_FARE = 1.00;
+	private final double RATE_PER_KM = 0.60;
+	private final double DAILY_FARE = 10.00;
+	private  final double MONTHLY_FARE = 50.00;
 
 	@Override
 	public double calculateFare(Route route, TicketType ticketType, DiscountType discountType) {
@@ -46,7 +46,7 @@ public class StandardFareCalculator implements FareCalculator {
 		
 		if(ticketType == TicketType.SINGLE) {
 			
-			if(discountType == DiscountType.STUDENT || discountType == DiscountType.OKU|| discountType == DiscountType.SENIOR) {
+			if(discountType == DiscountType.CHILD || discountType == DiscountType.SENIOR) {
 				fare /= 2;
 			}
 		}
