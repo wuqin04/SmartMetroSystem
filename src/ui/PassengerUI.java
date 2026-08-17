@@ -79,7 +79,75 @@ public class PassengerUI {
             case "1":
                 passenger.viewProfile();
                 break;
+                
             case "2":
+                System.out.println("\n[EDIT PROFILE]");
+                System.out.println("(1) Name");
+                System.out.println("(2) Email");
+                System.out.println("(3) Password");
+                System.out.print("Enter your choice: ");
+                
+                String editChoice = sc.nextLine();
+                
+                String newName = passenger.getName();
+                String newEmail = passenger.getEmail();
+                
+                String currPass = "";
+                String newPass = "";
+                String confirmPass = "";
+                
+                boolean isValidChoice = true;
+                
+                switch (editChoice) {
+                    case "1":
+                        System.out.print("Enter your new name: ");
+                        newName = sc.nextLine();
+                        
+                        if (newName.equals(passenger.getName())) {
+                            System.out.println("[ERROR]: Your new name cannot be the same as your current name.");
+                            isValidChoice = false;
+                        }
+                        break;
+                        
+                    case "2":
+                        System.out.print("Enter your new email: ");
+                        newEmail = sc.nextLine();
+                        
+                        if (newEmail.equalsIgnoreCase(passenger.getEmail())) {
+                             System.out.println("[ERROR]: Your new email cannot be the same as your current email.");
+                             isValidChoice = false;
+                        }
+                        break;
+                        
+                    case "3":
+                        // The model requires all three fields to process a password change
+                        System.out.print("Enter your current password: ");
+                        currPass = sc.nextLine();
+                        
+                        System.out.print("Enter your new password: ");
+                        newPass = sc.nextLine();
+                        
+                        System.out.print("Confirm your new password: ");
+                        confirmPass = sc.nextLine();
+                        break;
+                        
+                    default:
+                        System.out.println("[ERROR]: Invalid choice. Enter 1-3 only.");
+                        isValidChoice = false;
+                        break;
+                }
+                
+                if (isValidChoice) {
+                    try {
+                        passenger.editProfile(newName, newEmail, currPass, newPass, confirmPass);
+                        
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+                break;
+
+            case "3":
             	double amount = 0;
 				while (amount != -1) {
 					System.out.print("Enter amount to top up (-1 back to menu): RM");

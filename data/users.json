@@ -1,38 +1,19 @@
 [
 	{
-		"userId": "USER1786096422569",
+		"userId": "USER1786931068847",
 		"name": "wuqin",
 		"email": "wuqin@gmail.com",
 		"password": "123",
 		"role": "PASSENGER",
-		"balance": 0.0
-	}
-,
-,
-	{
-		"userId": "USER1786323684875",
-		"name": "dennis",
-		"email": "dennis@gmail.com",
-		"password": "123",
-		"role": "PASSENGER",
-		"balance": 0.0
-	}
-,
-	{
-		"userId": "USER1786096437063",
-		"name": "serene",
-		"email": "serene@gmail.com",
-		"password": "123",
-		"role": "PASSENGER",
-		"balance": 0.0
+		"balance": 0.0,
+		"dateOfBirth": "2006-04-19"
 	}
 ,
 	{
 		"userId": "ADMIN001",
-		"name": "admin",
-		"email": "admin@gmail.com",
+		"name": "sasuke",
+		"email": "sasuke@gmail.com",
 		"password": "admin",
-		"role": "ADMIN",
-		"balance": 0.0
+		"role": "ADMIN"
 	}
 ]

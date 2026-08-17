@@ -11,7 +11,7 @@ public abstract class User {
 	private String password;
 	private UserRole role;
 	
-	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@gmail\\.com$");
 	
 	// Accessors
 	public String getUserId() {
@@ -118,18 +118,14 @@ public abstract class User {
 		if(newName.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Name cannot be empty or spaces only.");
 		}
-		
-		if(!newName.matches("^[a-zA-Z]+(?: [a-zA-Z]+)")) {
-			throw new IllegalArgumentException("[ERROR]: Name can only contains letters and spaces.");
-		}
 			
 		if(newEmail.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Email cannot be empty or spaces only.");
 		} 
 		
-		if(!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			throw new IllegalArgumentException("[ERROR]: Invalid email format.");
-		}
+		if (!EMAIL_PATTERN.matcher(newEmail).matches()) {
+            throw new IllegalArgumentException("[ERROR]: Invalid email format.");
+        }
 	
 		// Check whether password edit is requested
 		boolean passwordChangeRequested = currPassword != null && !currPassword.isEmpty()
@@ -156,24 +152,8 @@ public abstract class User {
 				throw new IllegalArgumentException("[ERROR]: Current password is incorrect.");
 			}
 			
-			if(newPassword.length() < 8) {
-				throw new IllegalArgumentException("[ERROR]: New password must be at least 8 characters.");
-			}
-			
 			if(newPassword.contains(" ")) {
 				throw new IllegalArgumentException("[ERROR]: New password cannot contain spaces.");
-			}
-			
-			if(!newPassword.matches(".*[A-Z].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one uppercase letter.");
-			}
-			
-			if(!newPassword.matches(".*[a-z].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one lowercase letter.");
-			}
-			
-			if(!newPassword.matches(".*[0-9].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one number.");
 			}
 			
 			if(this.password.equals(newPassword)) {
@@ -193,26 +173,20 @@ public abstract class User {
 		this.name = newName;
 		this.email = newEmail;
 		
-		if(passwordChanged) {
+		if (passwordChanged) {
 			this.password = newPassword;
 		}
 		
-		if(nameChanged) {
-			System.out.println("Name has been changed.");
-		} else {
-			System.out.println("Name remains unchanged.");
-		}
+		if (nameChanged) {
+			System.out.println("[INFO]: Name has been changed.");
+		} 
 		
-		if(emailChanged) {
-			System.out.println("Email has been changed.");
-		} else {
-			System.out.println("Email remains unchanged.");
-		}
+		if (emailChanged) {
+			System.out.println("[INFO]: Email has been changed.");
+		} 
 		
-		if(passwordChanged) {
-			System.out.println("Password has been changed.");
-		} else {
-			System.out.println("Password remains unchanged.");
+		if (passwordChanged) {
+			System.out.println("[INFO]: Password has been changed.");
 		}
 	}
 }

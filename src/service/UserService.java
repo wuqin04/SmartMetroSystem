@@ -183,8 +183,8 @@ public class UserService {
 								"email": "%s",
 								"password": "%s",
 								"role": "%s",
-								"balance": %s
-								"date of birth": "%s"
+								"balance": %s,
+								"dateOfBirth": "%s"
 							}
 						""".formatted(
 								p.getUserId(),
@@ -194,6 +194,25 @@ public class UserService {
 								p.getRole(),
 								p.getBalance(),
 								p.getDateOfBirth()
+								);
+			}
+			else if (user.getRole() == UserRole.ADMIN) {
+				Admin a = (Admin) user;
+				
+				jsonString += """
+							{
+								"userId": "%s",
+								"name": "%s",
+								"email": "%s",
+								"password": "%s",
+								"role": "%s"
+							}
+						""".formatted(
+								a.getUserId(),
+								a.getName(),
+								a.getEmail(),
+								a.getPassword(),
+								a.getRole()
 								);
 			}
 			

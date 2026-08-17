@@ -20,14 +20,14 @@ public class TicketService {
 
 	private final ArrayList<Ticket> tickets;
 	private final FareCalculator fareCalculator;
-	private final DiscountEligibilityService discountEligibilityService;
+	private final DiscountService discountEligibilityService;
 	private final FileManager fileManager;
 	private final String fileName;
 	private final UserService userService;
 	private final StationService stationService;
 	
 	public TicketService(ArrayList<Ticket> tickets, FileManager fileManager, FareCalculator fareCalculator, 
-						DiscountEligibilityService discountEligibilityService, String fileName, UserService userService, StationService stationService) {
+						DiscountService discountEligibilityService, String fileName, UserService userService, StationService stationService) {
 		
 		if (tickets == null) {
 			throw new IllegalArgumentException("[ERROR]: Tickets cannot be null or blank.");
