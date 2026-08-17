@@ -51,6 +51,6 @@ public class ReportService {
 			}
 			if(found != true) {
 				System.out.println("No Cancelled Tickets.");
-			}
+			} Repush
 	}	
 }
