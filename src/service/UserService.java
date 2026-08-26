@@ -17,10 +17,12 @@ import exception.FileProcessingException;
 public class UserService {
 
 	private HashMap<String, User> users = new HashMap<>();
+	private ReportService reportService;
 	private JsonFileManager fileManager;
 	private String fileName;
 	
-	public UserService(JsonFileManager fileManager, String fileName) {
+	public UserService(ReportService reportService, JsonFileManager fileManager, String fileName) {
+		this.reportService = reportService;
 		
 		if (fileManager == null) {
 			throw new IllegalArgumentException(
@@ -144,7 +146,7 @@ public class UserService {
 					
 					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance, dateOfBirth);
 				} else if (role == UserRole.ADMIN) {
-					user = new Admin(userId, name, email, password);
+					user = new Admin(userId, name, email, password, reportService);
 				} else {
 					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
 				}

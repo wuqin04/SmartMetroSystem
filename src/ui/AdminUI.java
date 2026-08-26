@@ -6,19 +6,25 @@ import java.util.Scanner;
 import model.Admin;
 import model.Route;
 import model.Station;
+import model.Train;
+import service.ReportService;
 import service.RouteService;
 import service.StationService;
+import service.TrainService;
 
 public class AdminUI {
 	private Scanner sc;
-	private RouteService rs;
-	private StationService ss;
+	private RouteService routeService;
+	private StationService stationService;
+	private TrainService trainService;
 	private ArrayList<Route> routes;
 	
-	public AdminUI(Scanner sc, RouteService rs, StationService ss, ArrayList<Route> routes) {
+	public AdminUI(Scanner sc, RouteService routeService, StationService stationService, TrainService trainService, 
+			ArrayList<Route> routes) {
 		this.sc = sc;
-		this.rs = rs;
-		this.ss = ss;
+		this.routeService = routeService;
+		this.stationService = stationService;
+		this.trainService = trainService;
 		this.routes = routes;
 	}
 	
@@ -42,16 +48,17 @@ public class AdminUI {
             
             switch(choice) {
             case 1:
-            	stationsAndRoutesMenu();
+            	stationsAndRoutesMenu(admin);
             	break;
             case 2:
-            	// call Train method
+            	trainMenu(admin);
             	break;
             case 3:
             	// call User acc method
             	break;
             case 4:
             	// call Report method
+            	admin.viewReports();
             	break;
             case 0:
             	System.out.println("Logging out... Returning to main menu.");
@@ -67,7 +74,7 @@ public class AdminUI {
 		}
 	}
 	
-	private void stationsAndRoutesMenu() {
+	private void stationsAndRoutesMenu(Admin admin) {
 	    boolean back = false;
 	    
 	    while (!back) {
@@ -81,7 +88,7 @@ public class AdminUI {
 	        
 	        switch (choice) {
 	            case "1":
-	                stationsMenu();
+	                stationsMenu(admin);
 	                break;
 	                
 	            case "2":
@@ -99,7 +106,118 @@ public class AdminUI {
 	    }
 	}
 	
-	private void stationsMenu() {
+	private void stationsMenu(Admin admin) {
+		boolean back = false;
+		while (!back) {
+			System.out.println("\n[STATIONS MANAGEMENT]");
+			
+			System.out.println("(1) View Stations");
+			System.out.println("(2) Add Stations");
+			System.out.println("(3) Edit Station");
+			System.out.println("(0) Back to Main Dashboard");
+			System.out.print("Enter your choice: ");
+			
+			String choice = sc.nextLine();
+			
+			switch (choice) {
+			case "1":
+                boolean viewBack = false;
+                while (!viewBack) {
+                    System.out.println("\n[VIEW STATIONS]");
+                    System.out.println("(1) View All Stations");
+                    System.out.println("(2) Search Station by Name");
+                    System.out.println("(0) Back");
+                    System.out.print("Enter your choice: ");
+                    
+                    String viewChoice = sc.nextLine().trim();
+                    
+                    switch (viewChoice) {
+                        case "1":
+                            stationService.viewStations();
+                            break;
+                            
+                        case "2":
+                            System.out.print("\nEnter Station Name to search: ");
+                            String searchName = sc.nextLine().trim();
+                            
+                            try {
+                                Station foundStation = stationService.searchStation(searchName);
+                                
+                                if (foundStation != null) {
+                                    System.out.println("\n[STATION FOUND]");
+                                    foundStation.displayInfo();
+                                } else {
+                                    System.out.println("[INFO]: No station found with the name '" + searchName + "'.");
+                                }
+                            } catch (IllegalArgumentException e) {
+                                System.out.println(e.getMessage());
+                            }
+                            break;
+                            
+                        case "0":
+                            viewBack = true;
+                            break;
+                            
+                        default:
+                            System.out.println("[ERROR]: Invalid input, please enter 0-2.");
+                            break;
+                    }
+                }
+                break;
+				
+			case "2":
+				System.out.println("\n[ADD NEW STATION]");
+                
+                System.out.print("Enter Station Name (Must start with a capital letter): ");
+                String name = sc.nextLine().trim();
+                
+                System.out.print("Enter Station Location: ");
+                String location = sc.nextLine().trim();
+                
+                try {
+                    Station newStation = new Station("TEMP", name, location);                    
+                    stationService.addStation(newStation);
+                    
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+                
+			case "3":
+				System.out.println("\n[EDIT STATION]");
+                System.out.print("Enter Station ID to edit (e.g., STN001): ");
+                String editId = sc.nextLine().trim();
+                
+                try {
+                    Station stationToEdit = stationService.findStationById(editId);
+                    
+                    System.out.println("\n[CURRENT DETAILS]");
+                    stationToEdit.displayInfo();
+                    
+                    System.out.println("\n[INFO]: Leave blank and press Enter to keep current value.");
+                    
+                    System.out.print("Enter New Name (Must start with a capital letter): ");
+                    String newName = sc.nextLine();
+                    
+                    System.out.print("Enter New Location: ");
+                    String newLocation = sc.nextLine();
+                    
+                    stationService.editStation(editId, newName, newLocation);
+                    
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+				
+			case "0":
+	        	back = true;
+	        	break;
+	        	
+	    	default:
+	    		System.out.println("[ERROR]: Invalid input, please enter 0-2.");
+	    		break;
+			}
+		}
 		
 	}
 	
@@ -110,7 +228,8 @@ public class AdminUI {
 			System.out.println("\n[ROUTES MANAGEMENT]");
 			
 			System.out.println("(1) View Routes");
-			System.out.println("(2) Add Routes");
+			System.out.println("(2) Add Route");
+			System.out.println("(3) Edit Route");
 			System.out.println("(0) Back to Main Dashboard");
 	        System.out.print("Enter your choice: ");
 	        
@@ -118,20 +237,19 @@ public class AdminUI {
 	        
 	        switch (choice) {
 	        case "1":
-	        	// view routes method
-	        	rs.displayAllRoutes();
+	        	routeService.displayAllRoutes();
 	        	break;
 	        	
 	        case "2":
 	        	System.out.println("\n[ADD NEW ROUTE]");
 	        	
 	        	try {
-	        		ArrayList<Station> allStations = ss.getAllStations();
+	        		ArrayList<Station> allStations = stationService.getAllStations();
 	        		
 	        		if (allStations == null || allStations.isEmpty()) {
 	                    System.out.println("[ERROR]: No stations available in the system.");
 	                    System.out.println("[INFO]: Please add stations first before creating routes.");
-	                    return; // Immediately exit back to the menu
+	                    break; 
 	                }
 	        		
 	        		System.out.println("Available Stations:");
@@ -148,7 +266,7 @@ public class AdminUI {
 	                
 	                if (sourceChoice < 1 || sourceChoice > allStations.size()) {
 	                    System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
-	                    return;
+	                    break;
 	                }
 	                
 	                Station source = allStations.get(sourceChoice - 1);
@@ -158,13 +276,48 @@ public class AdminUI {
 	                
 	                if (destChoice < 1 || destChoice > allStations.size()) {
 	                    System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
-	                    return;
+	                    break;
 	                }
+	                
 	                Station destination = allStations.get(destChoice - 1);
 	                
-	                if (source.equals(destination)) {
+	                if (source.getStationId().equals(destination.getStationId())) {
 	                    System.out.println("[ERROR]: Source and Destination stations cannot be the same.");
-	                    return;
+	                    break; 
+	                }
+	                
+	                ArrayList<Route> existingRoutes = routeService.getAllRoutes(); 
+	                boolean hasError = false;
+
+	                for (Route r : existingRoutes) {
+	                    String existingSourceId = r.getSource().getStationId();
+	                    String existingDestId = r.getDestination().getStationId();
+	                    
+	                    // Rule A: Prevent duplicate routes (Checking both A->B and B->A)
+	                    if ((existingSourceId.equals(source.getStationId()) && existingDestId.equals(destination.getStationId())) ||
+	                        (existingSourceId.equals(destination.getStationId()) && existingDestId.equals(source.getStationId()))) {
+	                        System.out.println("[ERROR]: A route between these two stations already exists.");
+	                        hasError = true;
+	                        break;
+	                    }
+	                    
+	                    // Rule B: Enforce single outgoing connection (Prevents branching lines)
+	                    if (existingSourceId.equals(source.getStationId())) {
+	                        System.out.println("[ERROR]: Station '" + source.getName() + "' already connects outward to '" + r.getDestination().getName() + "'.");
+	                        hasError = true;
+	                        break;
+	                    }
+	                    
+	                    // Rule C: Enforce single incoming connection (Prevents merging lines)
+	                    if (existingDestId.equals(destination.getStationId())) {
+	                        System.out.println("[ERROR]: Station '" + destination.getName() + "' already receives a route from '" + r.getSource().getName() + "'.");
+	                        hasError = true;
+	                        break;
+	                    }
+	                }
+	                
+	                if (hasError) {
+	                    break;
 	                }
 	                
 	                System.out.print("Enter Route Distance in km (e.g., 5.5): ");
@@ -173,8 +326,8 @@ public class AdminUI {
 	                
 	                Route newRoute = new Route(routeId, source, destination, distance);
 	                
-	                rs.addRoute(newRoute);
-	                System.out.println("[SUCCESS]: Route " + routeId + " added and saved to routes.json successfully!");
+	                routeService.addRoute(newRoute);
+	                System.out.println("[SUCCESS]: Route " + routeId + " added successfully!");
 	                
 	        	} catch (NumberFormatException e) {
 	        		System.out.println("[ERROR]: Invalid distance format. Please enter a valid number.");
@@ -195,5 +348,85 @@ public class AdminUI {
 	    		break;
 	        }
 		}		
+	}
+	
+	private void trainMenu(Admin admin) {
+		boolean back = false;
+		
+		while (!back) {
+			System.out.println("\n[TRAINS MANAGEMENT]");
+			
+			System.out.println("(1) View Trains");
+			System.out.println("(2) Add Train");
+			System.out.println("(3) Edit Train");
+			System.out.println("(0) Back to Main Dashboard");
+			System.out.print("Enter your choice: ");
+			
+			String choice = sc.nextLine().trim();
+			
+			switch (choice) {
+			case "1":
+				trainService.viewTrains();
+				break;
+				
+			case "2":
+				System.out.println("\n[ADD NEW TRAIN]");
+				
+				System.out.print("Enter Train Name/Model: ");
+				String name = sc.nextLine().trim();
+				
+				try {
+					System.out.print("Enter Train Capacity (Number of seats): ");
+					int capacity = Integer.parseInt(sc.nextLine().trim());
+					
+					String generatedId = trainService.generateTrainId();
+					
+					Train newTrain = new Train(generatedId, name, capacity);
+					
+					trainService.addTrain(newTrain);
+					
+				} catch (NumberFormatException e) {
+					System.out.println("[ERROR]: Invalid capacity format. Please enter a valid number.");
+				} catch (IllegalArgumentException | IllegalStateException e) {
+					System.out.println(e.getMessage());
+				} catch (Exception e) {
+					System.out.println("[ERROR]: An unexpected error occurred: " + e.getMessage());
+				}
+				break;
+				
+			case "3":
+				System.out.println("\n[EDIT TRAIN]");
+				System.out.print("Enter Train ID to edit (e.g., TRN001): ");
+				String editId = sc.nextLine().trim();
+				
+				try {			
+					System.out.print("Enter New Name/Model: ");
+					String newName = sc.nextLine().trim();
+					
+					System.out.print("Enter New Capacity: ");
+					int newCapacity = Integer.parseInt(sc.nextLine().trim());
+					
+					Train updatedTrain = new Train(editId, newName, newCapacity);
+					
+					trainService.updateTrain(updatedTrain);
+					
+				} catch (NumberFormatException e) {
+					System.out.println("[ERROR]: Invalid capacity format. Please enter a valid number.");
+				} catch (IllegalArgumentException | IllegalStateException e) {
+					System.out.println(e.getMessage());
+				} catch (Exception e) {
+					System.out.println("[ERROR]: An unexpected error occurred: " + e.getMessage());
+				}
+				break;
+				
+			case "0":
+				back = true;
+				break;
+				
+			default:
+				System.out.println("[ERROR]: Invalid input, please enter 0-3.");
+				break;
+			}
+		}
 	}
 }

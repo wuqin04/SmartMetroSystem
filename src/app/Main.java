@@ -26,6 +26,7 @@ import service.TicketService;
 import service.TrainService;
 import service.DiscountService;
 import service.PaymentService;
+import service.ReportService;
 import service.RouteService;
 import service.StationService;
 
@@ -48,8 +49,9 @@ public class Main {
 		ArrayList<Ticket> 			tickets 		= new ArrayList<Ticket>();
 		ArrayList<Route>			routes			= new ArrayList<Route>();
 		
+		ReportService				reportService  	= new ReportService(tickets);
 		StationService				stationService  = new StationService(jsonFM, stationFile);
-		UserService 				userService     = new UserService(jsonFM, userFile);
+		UserService 				userService     = new UserService(reportService, jsonFM, userFile);
 		DiscountService				discountService = new DiscountService();
 		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, discountService, 
 														ticketFile, userService, stationService);
@@ -66,7 +68,7 @@ public class Main {
 		ticketService.loadTickets();
 		
 		PassengerUI 				passengerUI 	= new PassengerUI(sc, ticketService, routeService);
-		AdminUI 					adminUI			= new AdminUI(sc, routeService, stationService, routes);
+		AdminUI 					adminUI			= new AdminUI(sc, routeService, stationService, trainService, routes);
 		
 		String choice = "";
 		

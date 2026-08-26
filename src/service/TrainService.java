@@ -1,11 +1,11 @@
 package service;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import exception.FileProcessingException;
+import repository.FileManager;
 
 import model.Train;
-import repository.FileManager;
-import exception.FileProcessingException;
 import util.JsonUtil;
 
 public class TrainService {
@@ -97,32 +97,34 @@ public class TrainService {
 	
 	public void loadTrains() {
 		try {
-			Object loadedData = fileManager.loadData(fileName);
+			Object loadedObject = fileManager.loadData(fileName);
 			
-			if (loadedData == null) return;
+			if (loadedObject == null) return;
 			
-			String jsonString = String.valueOf(loadedData).trim();
+			String jsonString = String.valueOf(loadedObject).trim(); 
 			
-        	if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
+			if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
 			
 			trains.clear();
-			String[] blocks = jsonString.split("}");
 			
-			for (String block : blocks) {
+			String[] trainBlocks = jsonString.split("}");
+			
+			for (String block : trainBlocks) {
 				if (block.trim().isEmpty() || block.trim().equals("]")) {
 					continue;
 				}
 				
 				String trainId = JsonUtil.extractString(block, "trainId");
 				String trainName = JsonUtil.extractString(block, "trainName");
-				int trainCapacity = (int)JsonUtil.extractNumber(block, "capacity");
+				int trainCapacity = (int) JsonUtil.extractNumber(block, "capacity");
 				
 				Train train = new Train(trainId, trainName, trainCapacity);
+				
 				trains.add(train);
 			}
 			
 		} catch (FileProcessingException e) {
-			System.out.println("[INFO]: No existing trains found. Starting fresh.");
+			System.out.println("[INFO]: Creating new data.");
 		} catch (Exception e) {
 			throw new IllegalStateException("[ERROR]: Unable to load train data from " + fileName + ".", e);
 		}
@@ -135,16 +137,16 @@ public class TrainService {
 			Train t = trains.get(i);
 			
 			jsonString += """
-				  {
-				    "trainId": "%s",
-				    "trainName": "%s",
-				    "capacity": "%s",
-				  }
-			  """.formatted(
-					  t.getTrainId(), 
-					  t.getTrainName(),
-					  t.getCapacity()
-					  );
+						{
+							"trainId": "%s",
+							"trainName": "%s",
+							"capacity": %s
+						}
+					""".formatted(
+							t.getTrainId(), 
+							t.getTrainName(),
+							t.getCapacity()
+					);
 			
 			if (i < trains.size() - 1) {
 				jsonString += ",\n";
@@ -162,5 +164,28 @@ public class TrainService {
 			System.out.println("[ERROR]: Critical failure while saving trains to " + fileName);
 			throw e;
 		}
+	}
+	
+	public String generateTrainId() {
+		if (trains.isEmpty()) {
+			return "TRN001";
+		}
+		
+		int maxNum = 0;
+		for (Train t : trains) {
+			String currentId = t.getTrainId();
+			if (currentId.toUpperCase().startsWith("TRN")) {
+				try {
+					int num = Integer.parseInt(currentId.substring(3));
+					if (num > maxNum) {
+						maxNum = num;
+					}
+				} catch (NumberFormatException e) {
+					// Ignore safely if there is a malformed ID in the file
+				}
+			}
+		}
+		
+		return String.format("TRN%03d", maxNum + 1);
 	}
 }

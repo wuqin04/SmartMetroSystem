@@ -17,13 +17,13 @@ import service.TicketService;
 
 public class PassengerUI {
 	private Scanner sc;
-	private TicketService ts;
-	private RouteService rs;
+	private TicketService ticketService;
+	private RouteService routeService;
 	
-	public PassengerUI(Scanner sc, TicketService ts, RouteService rs) {
+	public PassengerUI(Scanner sc, TicketService ticketService, RouteService routeService) {
 		this.sc = sc;
-		this.ts = ts;
-		this.rs = rs;
+		this.ticketService = ticketService;
+		this.routeService = routeService;
 	}
 	
 	public void loadDashboard(Passenger passenger) {
@@ -234,7 +234,7 @@ public class PassengerUI {
 	
 	private void viewTicketAction(Passenger passenger) {
 		try {
-			ts.viewTickets(passenger);
+			ticketService.viewTickets(passenger);
 		} catch (IllegalArgumentException e) {
 			System.out.println(e.getMessage());
 		}
@@ -277,7 +277,7 @@ public class PassengerUI {
 		            String destInput = sc.nextLine();
 		            
 		            try {
-		            	routes = (ArrayList<Route>) rs.findRoutes(source, destination);
+		            	routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
 		            	for (Route route : routes) {
 		            		totalDistance += route.calculateDistance();
 		            		
@@ -352,7 +352,7 @@ public class PassengerUI {
 				                	Route fullRoute = new Route("R-temp", source, destination, totalDistance);
 				                	
 				                    try {
-										ts.buyTicket(passenger, fullRoute, selectedType);
+										ticketService.buyTicket(passenger, fullRoute, selectedType);
 									} catch (FileProcessingException e) {
 										System.out.println(e.getMessage());
 									}
@@ -385,7 +385,7 @@ public class PassengerUI {
 	    
 		try {
 			try {
-				ts.cancelTicket(ticketId, passenger);
+				ticketService.cancelTicket(ticketId, passenger);
 			} catch (FileProcessingException e) {
 				System.out.println(e.getMessage());
 			}

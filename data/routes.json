@@ -1,0 +1,310 @@
+[
+	{
+		"routeId": "R001",
+           "distanceKm": 1.9,
+           "sourceStationId": "STN001",
+           "sourceName": "Kajang",
+           "sourceLocation": "KTM interchange",
+           "destinationStationId": "STN002",
+           "destinationName": "Stadium Kajang",
+           "destinationLocation": "Town center"
+	}
+,
+	{
+		"routeId": "R002",
+           "distanceKm": 2.2,
+           "sourceStationId": "STN002",
+           "sourceName": "Stadium Kajang",
+           "sourceLocation": "Town center",
+           "destinationStationId": "STN003",
+           "destinationName": "Sungai Jernih",
+           "destinationLocation": "Near Hospital Kajang"
+	}
+,
+	{
+		"routeId": "R003",
+           "distanceKm": 2.7,
+           "sourceStationId": "STN003",
+           "sourceName": "Sungai Jernih",
+           "sourceLocation": "Near Hospital Kajang",
+           "destinationStationId": "STN004",
+           "destinationName": "Bukit Dukung",
+           "destinationLocation": "Near Sungai Long"
+	}
+,
+	{
+		"routeId": "R004",
+           "distanceKm": 1.5,
+           "sourceStationId": "STN004",
+           "sourceName": "Bukit Dukung",
+           "sourceLocation": "Near Sungai Long",
+           "destinationStationId": "STN005",
+           "destinationName": "Batu Sebelas Cheras (Batu 11)",
+           "destinationLocation": "Cheras-Kajang Station"
+	}
+,
+	{
+		"routeId": "R005",
+           "distanceKm": 1.5,
+           "sourceStationId": "STN005",
+           "sourceName": "Batu Sebelas Cheras (Batu 11)",
+           "sourceLocation": "Cheras-Kajang Station",
+           "destinationStationId": "STN006",
+           "destinationName": "Bandar Tun Hussein Onn",
+           "destinationLocation": "Near Aeon Cheras Selatan"
+	}
+,
+	{
+		"routeId": "R006",
+           "distanceKm": 1.7,
+           "sourceStationId": "STN006",
+           "sourceName": "Bandar Tun Hussein Onn",
+           "sourceLocation": "Near Aeon Cheras Selatan",
+           "destinationStationId": "STN007",
+           "destinationName": "Sri Raya",
+           "destinationLocation": "Cheras Batu 9"
+	}
+,
+	{
+		"routeId": "R007",
+           "distanceKm": 1.8,
+           "sourceStationId": "STN007",
+           "sourceName": "Sri Raya",
+           "sourceLocation": "Cheras Batu 9",
+           "destinationStationId": "STN008",
+           "destinationName": "Taman Suntex",
+           "destinationLocation": "Cheras-Kajang highway corridor"
+	}
+,
+	{
+		"routeId": "R008",
+           "distanceKm": 1.6,
+           "sourceStationId": "STN008",
+           "sourceName": "Taman Suntex",
+           "sourceLocation": "Cheras-Kajang highway corridor",
+           "destinationStationId": "STN009",
+           "destinationName": "Taman Connaught",
+           "destinationLocation": "Near UCSI University"
+	}
+,
+	{
+		"routeId": "R009",
+           "distanceKm": 1.5,
+           "sourceStationId": "STN009",
+           "sourceName": "Taman Connaught",
+           "sourceLocation": "Near UCSI University",
+           "destinationStationId": "STN010",
+           "destinationName": "Taman Mutiara",
+           "destinationLocation": "Near EkoCheras and Leisure Mall"
+	}
+,
+	{
+		"routeId": "R010",
+           "distanceKm": 1.2,
+           "sourceStationId": "STN010",
+           "sourceName": "Taman Mutiara",
+           "sourceLocation": "Near EkoCheras and Leisure Mall",
+           "destinationStationId": "STN011",
+           "destinationName": "Taman Midah",
+           "destinationLocation": "Near Hospital Universiti Kebangsaan Malaysia (HUKM)"
+	}
+,
+	{
+		"routeId": "R011",
+           "distanceKm": 1.4,
+           "sourceStationId": "STN011",
+           "sourceName": "Taman Midah",
+           "sourceLocation": "Near Hospital Universiti Kebangsaan Malaysia (HUKM)",
+           "destinationStationId": "STN012",
+           "destinationName": "Taman Pertama",
+           "destinationLocation": "Cheras residential area"
+	}
+,
+	{
+		"routeId": "R012",
+           "distanceKm": 1.0,
+           "sourceStationId": "STN012",
+           "sourceName": "Taman Pertama",
+           "sourceLocation": "Cheras residential area",
+           "destinationStationId": "STN013",
+           "destinationName": "Maluri",
+           "destinationLocation": "Interchange for Ampang Line"
+	}
+,
+	{
+		"routeId": "R013",
+           "distanceKm": 0.9,
+           "sourceStationId": "STN013",
+           "sourceName": "Maluri",
+           "sourceLocation": "Interchange for Ampang Line",
+           "destinationStationId": "STN014",
+           "destinationName": "Cochrane",
+           "destinationLocation": "Near MyTown and IKEA Cheras"
+	}
+,
+	{
+		"routeId": "R014",
+           "distanceKm": 0.8,
+           "sourceStationId": "STN014",
+           "sourceName": "Cochrane",
+           "sourceLocation": "Near MyTown and IKEA Cheras",
+           "destinationStationId": "STN015",
+           "destinationName": "Tun Razak Exchange (TRX)",
+           "destinationLocation": "Financial hub and Putrajaya Line interchange"
+	}
+,
+	{
+		"routeId": "R015",
+           "distanceKm": 1.1,
+           "sourceStationId": "STN015",
+           "sourceName": "Tun Razak Exchange (TRX)",
+           "sourceLocation": "Financial hub and Putrajaya Line interchange",
+           "destinationStationId": "STN016",
+           "destinationName": "Pavilion Bukit Bintang",
+           "destinationLocation": "City shopping district"
+	}
+,
+	{
+		"routeId": "R016",
+           "distanceKm": 2.3,
+           "sourceStationId": "STN016",
+           "sourceName": "Pavilion Bukit Bintang",
+           "sourceLocation": "City shopping district",
+           "destinationStationId": "STN017",
+           "destinationName": "Merdeka",
+           "destinationLocation": "Near Stadium Merdeka"
+	}
+,
+	{
+		"routeId": "R017",
+           "distanceKm": 1.4,
+           "sourceStationId": "STN017",
+           "sourceName": "Merdeka",
+           "sourceLocation": "Near Stadium Merdeka",
+           "destinationStationId": "STN018",
+           "destinationName": "Pasar Seni",
+           "destinationLocation": "Interchange for Kelana Jaya Line"
+	}
+,
+	{
+		"routeId": "R018",
+           "distanceKm": 2.5,
+           "sourceStationId": "STN018",
+           "sourceName": "Pasar Seni",
+           "sourceLocation": "Interchange for Kelana Jaya Line",
+           "destinationStationId": "STN019",
+           "destinationName": "Muzium Negara",
+           "destinationLocation": "Linked to KL Sentral"
+	}
+,
+	{
+		"routeId": "R019",
+           "distanceKm": 2.1,
+           "sourceStationId": "STN019",
+           "sourceName": "Muzium Negara",
+           "sourceLocation": "Linked to KL Sentral",
+           "destinationStationId": "STN020",
+           "destinationName": "Semantan",
+           "destinationLocation": "Edge of Damansara Heights"
+	}
+,
+	{
+		"routeId": "R020",
+           "distanceKm": 1.5,
+           "sourceStationId": "STN020",
+           "sourceName": "Semantan",
+           "sourceLocation": "Edge of Damansara Heights",
+           "destinationStationId": "STN021",
+           "destinationName": "Pusat Bandar Damansara",
+           "destinationLocation": "Corporate enclave"
+	}
+,
+	{
+		"routeId": "R021",
+           "distanceKm": 1.1,
+           "sourceStationId": "STN021",
+           "sourceName": "Pusat Bandar Damansara",
+           "sourceLocation": "Corporate enclave",
+           "destinationStationId": "STN022",
+           "destinationName": "Phileo Damansara",
+           "destinationLocation": "Near Section 16 PJ"
+	}
+,
+	{
+		"routeId": "R022",
+           "distanceKm": 1.6,
+           "sourceStationId": "STN022",
+           "sourceName": "Phileo Damansara",
+           "sourceLocation": "Near Section 16 PJ",
+           "destinationStationId": "STN023",
+           "destinationName": "Taman Tun Dr Ismail (TTDI)",
+           "destinationLocation": "Residential and commercial hub"
+	}
+,
+	{
+		"routeId": "R023",
+           "distanceKm": 1.4,
+           "sourceStationId": "STN023",
+           "sourceName": "Taman Tun Dr Ismail (TTDI)",
+           "sourceLocation": "Residential and commercial hub",
+           "destinationStationId": "STN024",
+           "destinationName": "Bandar Utama",
+           "destinationLocation": "Near 1 Utama"
+	}
+,
+	{
+		"routeId": "R024",
+           "distanceKm": 2.5,
+           "sourceStationId": "STN024",
+           "sourceName": "Bandar Utama",
+           "sourceLocation": "Near 1 Utama",
+           "destinationStationId": "STN025",
+           "destinationName": "Mutiara Damansara",
+           "destinationLocation": "Near The Curve and IKEA"
+	}
+,
+	{
+		"routeId": "R025",
+           "distanceKm": 1.5,
+           "sourceStationId": "STN025",
+           "sourceName": "Mutiara Damansara",
+           "sourceLocation": "Near The Curve and IKEA",
+           "destinationStationId": "STN026",
+           "destinationName": "Surian",
+           "destinationLocation": "Near Sunway Nexis"
+	}
+,
+	{
+		"routeId": "R026",
+           "distanceKm": 2.1,
+           "sourceStationId": "STN026",
+           "sourceName": "Surian",
+           "sourceLocation": "Near Sunway Nexis",
+           "destinationStationId": "STN027",
+           "destinationName": "Kota Damansara",
+           "destinationLocation": "Near SEGI Univerisity"
+	}
+,
+	{
+		"routeId": "R027",
+           "distanceKm": 2.1,
+           "sourceStationId": "STN027",
+           "sourceName": "Kota Damansara",
+           "sourceLocation": "Near SEGI Univerisity",
+           "destinationStationId": "STN028",
+           "destinationName": "Kwasa Sentral",
+           "destinationLocation": "Suburbs near Kota Damansara"
+	}
+,
+	{
+		"routeId": "R028",
+           "distanceKm": 2.7,
+           "sourceStationId": "STN028",
+           "sourceName": "Kwasa Sentral",
+           "sourceLocation": "Suburbs near Kota Damansara",
+           "destinationStationId": "STN029",
+           "destinationName": "Kwasa Damansara",
+           "destinationLocation": "Terminal interchange"
+	}
+
+]
