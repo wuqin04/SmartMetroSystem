@@ -3,25 +3,30 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import enums.DiscountType;
 import model.Admin;
 import model.Route;
 import model.Station;
 import model.Train;
+import model.User;
 import service.ReportService;
 import service.RouteService;
 import service.StationService;
 import service.TrainService;
+import service.UserService;
 
 public class AdminUI {
 	private Scanner sc;
+	private UserService userService;
 	private RouteService routeService;
 	private StationService stationService;
 	private TrainService trainService;
 	private ArrayList<Route> routes;
 	
-	public AdminUI(Scanner sc, RouteService routeService, StationService stationService, TrainService trainService, 
+	public AdminUI(Scanner sc, UserService userService, RouteService routeService, StationService stationService, TrainService trainService, 
 			ArrayList<Route> routes) {
 		this.sc = sc;
+		this.userService = userService;
 		this.routeService = routeService;
 		this.stationService = stationService;
 		this.trainService = trainService;
@@ -54,11 +59,10 @@ public class AdminUI {
             	trainMenu(admin);
             	break;
             case 3:
-            	// call User acc method
+            	userAccountsMenu(admin);
             	break;
             case 4:
-            	// call Report method
-            	admin.viewReports();
+            	reportMenu(admin);
             	break;
             case 0:
             	System.out.println("Logging out... Returning to main menu.");
@@ -428,5 +432,124 @@ public class AdminUI {
 				break;
 			}
 		}
+	}
+	
+	private void reportMenu(Admin admin) {
+		boolean back = false;
+		
+		while (!back) {
+			System.out.println("\n=================================");
+			System.out.println("          [REPORTS MENU]         ");
+			System.out.println("=================================");
+			System.out.println("(1) View Total Sales Report");
+			System.out.println("(2) View Total Revenue Report");
+			System.out.println("(3) View Cancelled Tickets Report");
+			System.out.println("(0) Back to Main Dashboard");
+			System.out.println("=================================");
+			System.out.print("Enter your choice: ");
+			
+			String choice = sc.nextLine().trim();
+			
+			switch (choice) {
+			case "1":
+				System.out.println("\n--------------------------------------------------");
+				System.out.println("               TOTAL SALES REPORT                 ");
+				System.out.println("--------------------------------------------------");
+				admin.viewTotalSales();
+				System.out.println("--------------------------------------------------");
+				break;
+				
+			case "2":
+				System.out.println("\n--------------------------------------------------");
+				System.out.println("              TOTAL REVENUE REPORT                ");
+				System.out.println("--------------------------------------------------");
+				admin.viewTotalRevenue();
+				System.out.println("--------------------------------------------------");
+				break;
+				
+			case "3":
+				System.out.println("\n--------------------------------------------------");
+				System.out.println("             CANCELLED TICKETS REPORT             ");
+				System.out.println("--------------------------------------------------");
+				admin.viewCancelledTickets();
+				System.out.println("--------------------------------------------------");
+				break;
+				
+			case "0":
+				back = true;
+				break;
+				
+			default:
+				System.out.println("[ERROR]: Invalid input. Please enter 0-3.");
+				break;
+			}
+		}
+	}
+	
+	private void userAccountsMenu(Admin admin) {
+	    boolean back = false;
+	    
+	    while (!back) {
+	        System.out.println("\n[USER ACCOUNTS MANAGEMENT]");
+	        System.out.println("(1) View All Users");
+	        System.out.println("(2) Search User by Email");
+	        System.out.println("(3) Manage User Account (Suspend/Concession)");
+	        System.out.println("(0) Back to Main Dashboard");
+	        System.out.print("Enter your choice: ");
+	        
+	        String choice = sc.nextLine().trim();
+	        
+	        switch (choice) {
+	            case "1":
+	                userService.viewAllUsers();
+	                break;
+	            case "2":
+	                searchUserUI();
+	                break;
+	            case "3":
+	                manageUserUI();
+	                break;
+	            case "0":
+	                back = true; 
+	                break;
+	            default:
+	                System.out.println("[ERROR]: Invalid input. Try again with 0-3.");
+	                break;
+	        }
+	    }
+	}
+
+	private void searchUserUI() {
+	    System.out.println("\n[SEARCH USER]");
+	    System.out.print("Enter User Email: ");
+	    String email = sc.nextLine().trim();
+	    
+	    User foundUser = userService.searchUserByEmail(email);
+	    
+	    if (foundUser != null) {
+	        System.out.println("\n[USER FOUND]");
+	        foundUser.viewProfile(); 
+	    } else {
+	        System.out.println("[INFO]: No user found with the email '" + email + "'.");
+	    }
+	}
+
+	private void manageUserUI() {
+	    System.out.println("\n[MANAGE USER ACCOUNT]");
+	    System.out.print("Enter User Email to manage: ");
+	    String email = sc.nextLine().trim();
+	    
+	    User targetUser = userService.searchUserByEmail(email);
+	    
+	    if (targetUser == null) {
+	        System.out.println("[ERROR]: User not found.");
+	        return;
+	    }
+	    
+	    boolean currentStatus = targetUser.isSuspended();
+	    userService.setUserSuspension(email, !currentStatus);
+	    
+	    System.out.println("[SUCCESS]: Account " + targetUser.getEmail() + 
+	                       " is now " + (!currentStatus ? "SUSPENDED" : "ACTIVE"));
 	}
 }

@@ -1,5 +1,6 @@
 package model;
 
+import enums.DiscountType;
 import enums.UserRole;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -10,6 +11,8 @@ public abstract class User {
 	private String email;
 	private String password;
 	private UserRole role;
+	private boolean isSuspended;
+	private DiscountType discountType;
 	
 	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@gmail\\.com$");
 	
@@ -34,6 +37,14 @@ public abstract class User {
 		return role;
 	}
 	
+	public boolean isSuspended() {
+		return isSuspended;
+	}
+	
+	public DiscountType getDiscountType() {
+	    return discountType;
+	}
+	
 	// Mutators
 	public void setUserId(String userId) {
 		this.userId = userId;
@@ -53,6 +64,14 @@ public abstract class User {
 	
 	public void setRole(UserRole role) {
 		this.role = role;
+	}
+	
+	public void setSuspended(boolean suspended) {
+		this.isSuspended = suspended;
+	}
+	
+	public void setDiscountType(DiscountType discountType) {
+	    this.discountType = discountType;
 	}
 	
 	public User(String userId, String name, String email, String password, UserRole role) {
@@ -84,10 +103,20 @@ public abstract class User {
 		this.email = email;
 		this.password = password;
 		this.role = role;
+        
+        this.isSuspended = false;
+        this.discountType = DiscountType.NONE;
 	}
 	
 	public boolean login(String email, String password) {
-		return this.email.equals(email) && this.password.equals(password);
+		if (this.email.equals(email) && this.password.equals(password)) {
+			// Check if account is suspended before allowing successful login
+			if (this.isSuspended) {
+				throw new IllegalStateException("[ERROR]: Account is suspended. Please contact the administrator.");
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	public void viewProfile() {
@@ -96,6 +125,8 @@ public abstract class User {
 		System.out.println("Name: " + this.name);
 		System.out.println("Email: " + this.email);
 		System.out.println("Role: " + this.role);
+		System.out.println("Fare Tier: " + this.discountType);
+		System.out.println("Account Status: " + (this.isSuspended ? "Suspended" : "Active"));
 		System.out.println("Password: " + this.password);
 	}
 	
@@ -112,9 +143,9 @@ public abstract class User {
 		
 		// remove the spaces from the existing name and email
 		String newName = name.strip();
-	    String newEmail = email.strip();
+        String newEmail = email.strip();
 		
-	    // to make sure name and email is not empty and match the format 
+        // to make sure name and email is not empty and match the format 
 		if(newName.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Name cannot be empty or spaces only.");
 		}

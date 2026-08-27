@@ -1,7 +1,7 @@
 [
 	{
 		"userId": "USER1786931068847",
-		"name": "wuqin",
+		"name": "Tan Wei Jian",
 		"email": "wuqin@gmail.com",
 		"password": "123",
 		"role": "PASSENGER",
@@ -16,4 +16,15 @@
 		"password": "admin",
 		"role": "ADMIN"
 	}
+,
+	{
+		"userId": "USER1787823050919",
+		"name": "serene",
+		"email": "serene@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0,
+		"dateOfBirth": "2025-04-19"
+	}
+
 ]

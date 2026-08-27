@@ -14,14 +14,17 @@ import payment.CardPayment;
 import payment.CashPayment;
 import service.RouteService;
 import service.TicketService;
+import service.UserService;
 
 public class PassengerUI {
 	private Scanner sc;
+	private UserService userService;
 	private TicketService ticketService;
 	private RouteService routeService;
 	
-	public PassengerUI(Scanner sc, TicketService ticketService, RouteService routeService) {
+	public PassengerUI(Scanner sc, UserService us, TicketService ticketService, RouteService routeService) {
 		this.sc = sc;
+		this.userService = us;
 		this.ticketService = ticketService;
 		this.routeService = routeService;
 	}
@@ -138,12 +141,13 @@ public class PassengerUI {
                 }
                 
                 if (isValidChoice) {
-                    try {
-                        passenger.editProfile(newName, newEmail, currPass, newPass, confirmPass);
-                        
-                    } catch (IllegalArgumentException e) {
-                        System.out.println(e.getMessage());
-                    }
+                	try {
+                	    userService.updateUserProfile(passenger, newName, newEmail, currPass, newPass, confirmPass);
+                	} catch (IllegalArgumentException | IllegalStateException e) {
+                	    System.out.println(e.getMessage());
+                	} catch (Exception e) {
+                	    System.out.println("[ERROR]: An unexpected error occurred: " + e.getMessage());
+                	}
                 }
                 break;
 

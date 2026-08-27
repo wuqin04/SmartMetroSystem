@@ -67,8 +67,8 @@ public class Main {
 		routeService.loadRoutes();  
 		ticketService.loadTickets();
 		
-		PassengerUI 				passengerUI 	= new PassengerUI(sc, ticketService, routeService);
-		AdminUI 					adminUI			= new AdminUI(sc, routeService, stationService, trainService, routes);
+		PassengerUI 				passengerUI 	= new PassengerUI(sc, userService, ticketService, routeService);
+		AdminUI 					adminUI			= new AdminUI(sc, userService, routeService, stationService, trainService, routes);
 		
 		String choice = "";
 		
@@ -168,6 +168,7 @@ public class Main {
 					System.out.println("[ERROR]: Invalid format or date. Try again.");
 				}
 			}
+			
 			
 			System.out.print("Enter your email: ");
 			String email = sc.nextLine().trim();

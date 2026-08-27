@@ -35,10 +35,15 @@ public class Admin extends User {
 	
 	}
 	
-	public void viewReports() {
-	
+	public void viewTotalSales() {
 		reportService.showTotalSales();
+	}
+	
+	public void viewTotalRevenue() {
 		reportService.showTotalRevenue();
+	}
+	
+	public void viewCancelledTickets() {
 		reportService.showCancelledTickets();
 	}
 }

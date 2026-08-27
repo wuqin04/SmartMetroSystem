@@ -1,7 +1,9 @@
 package model;
 
+import enums.DiscountType;
 import enums.UserRole;
 import java.time.LocalDate;
+import java.time.Period;
 
 public class Passenger extends User {
 	private double balance;
@@ -58,5 +60,15 @@ public class Passenger extends User {
 			throw new IllegalArgumentException("[ERROR]: Date of birth cannot be in the future.");
 		}
 		this.dateOfBirth = dateOfBirth;
+		
+		int age = Period.between(this.dateOfBirth, LocalDate.now()).getYears();
+		
+		if (age <= 12) {
+			this.setDiscountType(DiscountType.CHILD);
+		} else if (age >= 60) {
+			this.setDiscountType(DiscountType.SENIOR);
+		} else {
+            this.setDiscountType(DiscountType.NONE);
+		}
 	}
 }
