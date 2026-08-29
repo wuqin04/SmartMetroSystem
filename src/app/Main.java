@@ -53,10 +53,10 @@ public class Main {
 		StationService				stationService  = new StationService(jsonFM, stationFile);
 		UserService 				userService     = new UserService(reportService, jsonFM, userFile);
 		DiscountService				discountService = new DiscountService();
-		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, discountService, 
-														ticketFile, userService, stationService);
 		RouteService				routeService	= new RouteService(routes, jsonFM, routeFile);
 		TrainService                trainService    = new TrainService(jsonFM, trainFile); 
+		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, discountService, 
+														ticketFile, userService, stationService, trainService);
 		PaymentService              paymentService  = new PaymentService(jsonFM, paymentFile);
 		
 		// load all data
@@ -67,7 +67,7 @@ public class Main {
 		routeService.loadRoutes();  
 		ticketService.loadTickets();
 		
-		PassengerUI 				passengerUI 	= new PassengerUI(sc, userService, ticketService, routeService);
+		PassengerUI 				passengerUI 	= new PassengerUI(sc, userService, ticketService, routeService, stationService);
 		AdminUI 					adminUI			= new AdminUI(sc, userService, routeService, stationService, trainService, routes);
 		
 		String choice = "";
@@ -181,6 +181,7 @@ public class Main {
 			if (password.equalsIgnoreCase("99")) return;
 			
 			String userId = "USER" + System.currentTimeMillis();
+					;
 			
 			try {
 				Passenger passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0, birthDate);

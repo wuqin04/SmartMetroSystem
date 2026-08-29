@@ -6,13 +6,16 @@ import java.util.Scanner;
 import enums.TicketType;
 import exception.FileProcessingException;
 import exception.TicketNotFoundException;
+import fare.StandardFareCalculator;
 import model.Passenger;
 import model.Route;
 import model.Station;
 import payment.Payment;
+import payment.WalletPayment;
 import payment.CardPayment;
 import payment.CashPayment;
 import service.RouteService;
+import service.StationService;
 import service.TicketService;
 import service.UserService;
 
@@ -21,12 +24,14 @@ public class PassengerUI {
 	private UserService userService;
 	private TicketService ticketService;
 	private RouteService routeService;
+	private StationService stationService;
 	
-	public PassengerUI(Scanner sc, UserService us, TicketService ticketService, RouteService routeService) {
+	public PassengerUI(Scanner sc, UserService us, TicketService ticketService, RouteService routeService, StationService stationService) {
 		this.sc = sc;
 		this.userService = us;
 		this.ticketService = ticketService;
 		this.routeService = routeService;
+		this.stationService = stationService;
 	}
 	
 	public void loadDashboard(Passenger passenger) {
@@ -88,6 +93,7 @@ public class PassengerUI {
                 System.out.println("(1) Name");
                 System.out.println("(2) Email");
                 System.out.println("(3) Password");
+                System.out.println("(0) Back to Profile Menu");
                 System.out.print("Enter your choice: ");
                 
                 String editChoice = sc.nextLine();
@@ -123,7 +129,6 @@ public class PassengerUI {
                         break;
                         
                     case "3":
-                        // The model requires all three fields to process a password change
                         System.out.print("Enter your current password: ");
                         currPass = sc.nextLine();
                         
@@ -132,6 +137,10 @@ public class PassengerUI {
                         
                         System.out.print("Confirm your new password: ");
                         confirmPass = sc.nextLine();
+                        break;
+                       
+                    case "0":
+                        isValidChoice = false; 
                         break;
                         
                     default:
@@ -212,17 +221,14 @@ public class PassengerUI {
             
             switch (choice) {
             case 1:
-            	// call view ticket method
             	viewTicketAction(passenger);
             	break;
             	
             case 2:
-            	// call buy ticket method
             	buyTicketAction(passenger);
             	break;
             	
             case 3:
-            	// call cancel ticket method
             	cancelTicketAction(passenger);
             	break;
             	
@@ -245,27 +251,27 @@ public class PassengerUI {
 	}
 	
 	private void buyTicketAction(Passenger passenger) {
+		StandardFareCalculator fareCalculator = new StandardFareCalculator();
+		
 		while (true) {
 			System.out.println("\n[BUY TICKET]");
-		    
 		    System.out.println("Choose your ticket type:");
 		    System.out.println("(1) Single Trip (Calculated by distance)");
-		    System.out.println("(2) Daily Pass (RM15.00)");
+		    System.out.println("(2) Daily Pass (RM10.00)");
 		    System.out.println("(3) Monthly Pass (RM50.00)");
 		    System.out.println("(0) Back to Ticket Menu");
 		    System.out.print("Enter your choice: ");
 		    
-		    String ticketChoice = sc.nextLine();
+		    String ticketChoice = sc.nextLine().trim();
 		    
 		    if (ticketChoice.equals("0")) {
 		    	return;
 		    }
 		    
-		    // Variables to hold the details before we create the ticket
 		    TicketType selectedType = null;
 		    Station source = null;
 		    Station destination = null;
-		    ArrayList<Route> routes = null;
+		    Route fullRoute = null; 
 		    double totalDistance = 0.0;
 		    double fare = 0.0;
 		    
@@ -273,38 +279,62 @@ public class PassengerUI {
 		        case "1":
 		            selectedType = TicketType.SINGLE;
 		            
-		            // TODO: The source and destination are created by admin, user cannot choose any by their own
-		            System.out.print("Enter Source Station: ");
-		            String srcInput = sc.nextLine();
+		            ArrayList<Station> allStations = stationService.getAllStations();
 		            
-		            System.out.print("Enter Destination Station: ");
-		            String destInput = sc.nextLine();
+		            if (allStations == null || allStations.isEmpty()) {
+		            	System.out.println("[ERROR]: No stations available in the system.");
+		            	continue;
+		            }
+		            
+		            System.out.println("\n[AVAILABLE STATIONS]");
+		            for (int i = 0; i < allStations.size(); i++) {
+		            	System.out.printf("(%d) %s\n", (i + 1), allStations.get(i).getName());
+		            }
 		            
 		            try {
-		            	routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
+			            System.out.print("Select Source Station (Number): ");
+			            int srcChoice = Integer.parseInt(sc.nextLine().trim());
+			            source = allStations.get(srcChoice - 1);
+			            
+			            System.out.print("Select Destination Station (Number): ");
+			            int destChoice = Integer.parseInt(sc.nextLine().trim());
+			            destination = allStations.get(destChoice - 1);
+			            
+			            if (source.getStationId().equals(destination.getStationId())) {
+			            	System.out.println("[ERROR]: Source and destination cannot be the same.");
+			            	continue;
+			            }
+			            
+			            ArrayList<Route> routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
+			            
+			            if (routes == null || routes.isEmpty()) {
+			            	System.out.println("[ERROR]: No connecting routes found between these stations.");
+			            	continue;
+			            }
+			            
 		            	for (Route route : routes) {
 		            		totalDistance += route.calculateDistance();
-		            		
-				            // TODO: Use StandardFareCalculator here later
-				            // current fare is just assumption without StandardFareCalculator
-				            fare = 5.00; 
 		            	}
 		            	
+		            	fullRoute = new Route("R-TEMP", source, destination, totalDistance);
+		            	
+		            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+		            	System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
+		            	continue;
 		            } catch (IllegalArgumentException e) {
 		            	System.out.println(e.getMessage());
 		            	continue;
 		            }   
-		            
 		            break;
 		            
 		        case "2":
 		            selectedType = TicketType.DAILY;
-		            fare = 15.00; // Flat rate
+		            fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
 		            break;
 		            
 		        case "3":
 		            selectedType = TicketType.MONTHLY;
-		            fare = 50.00; // Flat rate
+		            fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
 		            break;
 		            
 		        default:
@@ -312,69 +342,77 @@ public class PassengerUI {
 		            continue;
 		    }
 		    
-		    // If a valid type was selected, proceed to checkout
-		    if (selectedType != null) {
-		    	System.out.println("\n[ORDER SUMMARY]");
-		        System.out.println("Ticket Type : " + selectedType);
-		        if (selectedType == TicketType.SINGLE) {
-		            System.out.println("Route     : " + source.getName() + " to " + destination.getName());
+		    try {
+		    	fare = fareCalculator.calculateFare(fullRoute, selectedType, passenger.getDiscountType());
+		    } catch (IllegalArgumentException e) {
+		    	System.out.println(e.getMessage());
+		    	continue;
+		    }
+		    
+		    // Proceed to Checkout
+		    System.out.println("\n[ORDER SUMMARY]");
+	        System.out.println("Ticket Type   : " + selectedType);
+	        if (selectedType == TicketType.SINGLE) {
+	            System.out.println("Route         : " + source.getName() + " -> " + destination.getName());
+	        }
+	        System.out.println("Fare Tier     : " + passenger.getDiscountType());
+	        System.out.printf("Total Fare    : RM %.2f\n", fare);
+	        
+	        System.out.print("Confirm purchase? (Y/N): ");
+	        String confirm = sc.nextLine().trim();
+	        
+        	if (confirm.equalsIgnoreCase("Y")) {
+        		boolean paymentSuccess = false;
+        		
+        		while (!paymentSuccess) {
+        			System.out.println("\n[PAYMENT METHOD]");
+		            System.out.println("(1) Cash");
+		            System.out.println("(2) Card");
+		            System.out.printf("(3) Metro Wallet (Current Balance: RM%.2f)\n", passenger.getBalance());
+		            System.out.println("(0) Cancel Payment");
+		            System.out.print("Enter your choice: ");
+		            
+		            String payOption = sc.nextLine().trim();
+		            Payment paymentMethod = null;
+		            
+		            if (payOption.equals("0")) {
+		            	System.out.println("Payment cancelled.");
+		            	break; 
+		            }
+		            
+		            switch (payOption) {
+			            case "1":
+			            	paymentMethod = new CashPayment();
+			            	break;
+			            case "2":
+			            	System.out.print("Enter 16-Digit Card Number: ");
+			            	String cardNum = sc.nextLine().trim();
+			            	paymentMethod = new CardPayment(cardNum);
+			            	break;
+			            case "3":
+			            	paymentMethod = new WalletPayment(passenger);
+			            	break;
+			            default:
+			                System.out.println("[ERROR]: Invalid payment option selected.");
+			                continue; 
+		            }
+		            
+		            try {
+		                if (paymentMethod.pay(fare)) {
+		                    try {
+								ticketService.buyTicket(passenger, fullRoute, selectedType);
+								paymentSuccess = true;
+							} catch (Exception e) { 
+								System.out.println(e.getMessage());
+							}
+		                }
+		            } catch (IllegalArgumentException e) {
+		                System.out.println(e.getMessage()); 
+		            }
 		        }
-		        System.out.println("Total Fare: RM " + fare);
-		        System.out.print("Confirm purchase? (Y/N): ");
-		        
-		        String confirm = sc.nextLine();
-		        
-		        while (true) {
-		        	if (confirm.equalsIgnoreCase("Y")) {
-		        		boolean paymentSuccess = false;
-		        		
-		        		while (!paymentSuccess) {
-		        			System.out.println("\n[PAYMENT METHOD]");
-				            System.out.println("1. Cash");
-				            System.out.println("2. Card");
-				            System.out.print("Enter your choice: ");
-				            
-				            String payOption = sc.nextLine();
-				            Payment paymentMethod = null;
-				            
-				            switch (payOption) {
-				            case "1":
-				            	paymentMethod = new CashPayment();
-				            	break;
-				            case "2":
-				            	System.out.println("Enter Card Number: ");
-				            	String cardNum = sc.nextLine();
-				            	paymentMethod = new CardPayment(cardNum);
-				            	break;
-				            default:
-				                System.out.println("[FAILED]: Invalid payment option selected. Retrying payment.");
-				                continue;
-				            }
-				            
-				            try {
-				                if (paymentMethod.pay(fare)) {
-				                	Route fullRoute = new Route("R-temp", source, destination, totalDistance);
-				                	
-				                    try {
-										ticketService.buyTicket(passenger, fullRoute, selectedType);
-									} catch (FileProcessingException e) {
-										System.out.println(e.getMessage());
-									}
-				                    
-				                    paymentSuccess = true;
-				                }
-				            } catch (IllegalArgumentException e) {
-				                System.out.println("[ERROR]: " + e.getMessage()); 
-				            }
-				            
-				        } 
-		        		
-		        	}
-		        	else {
-		        		System.out.println("Purchase cancelled. Returning to menu...");
-		        	}
-	        	}
-	        }   
+        	} else {
+        		System.out.println("Purchase cancelled. Returning to menu...");
+        	}
 	    }
 	}
 	

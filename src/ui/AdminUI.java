@@ -48,31 +48,30 @@ public class AdminUI {
             
             System.out.print("Enter your choice: ");
             
-            int choice = sc.nextInt();
-            sc.nextLine();
+            String choice = sc.nextLine().trim();
             
             switch(choice) {
-            case 1:
+            case "1":
             	stationsAndRoutesMenu(admin);
             	break;
-            case 2:
+            case "2":
             	trainMenu(admin);
             	break;
-            case 3:
+            case "3":
             	userAccountsMenu(admin);
             	break;
-            case 4:
+            case "4":
             	reportMenu(admin);
             	break;
-            case 0:
+            case "0":
             	System.out.println("Logging out... Returning to main menu.");
             	loggedIn = false;
             	break;
-            case 99:
+            case "99":
             	System.out.println("Exiting program...");
             	System.exit(0);
             default:
-            	System.out.println("[ERROR]: Invalid choice. Please try again.");
+            	System.out.println("[ERROR]: Invalid choice. Please enter a valid number (0-4, or 99).");
             	break;
             }
 		}
@@ -546,10 +545,44 @@ public class AdminUI {
 	        return;
 	    }
 	    
-	    boolean currentStatus = targetUser.isSuspended();
-	    userService.setUserSuspension(email, !currentStatus);
-	    
-	    System.out.println("[SUCCESS]: Account " + targetUser.getEmail() + 
-	                       " is now " + (!currentStatus ? "SUSPENDED" : "ACTIVE"));
+	    boolean back = false;
+	    while (!back) {
+	        boolean currentStatus = targetUser.isSuspended();
+	        String statusText = currentStatus ? "SUSPENDED" : "ACTIVE";
+	        
+	        System.out.println("\n[ACCOUNT DETAILS]");
+	        System.out.println("Name: " + targetUser.getName());
+	        System.out.println("Email: " + targetUser.getEmail());
+	        System.out.println("Current Status: " + statusText);
+	        
+	        System.out.println("\n[ACTIONS]");
+	        if (currentStatus) {
+	            System.out.println("(1) Reactivate Account");
+	        } else {
+	            System.out.println("(1) Suspend Account");
+	        }
+	        System.out.println("(0) Cancel / Go Back");
+	        System.out.print("Enter your choice: ");
+	        
+	        String choice = sc.nextLine().trim();
+	        
+	        switch (choice) {
+	            case "1":
+	                userService.setUserSuspension(email, !currentStatus);
+	                System.out.println("[SUCCESS]: Account '" + targetUser.getEmail() + 
+	                                   "' is now " + (!currentStatus ? "SUSPENDED" : "ACTIVE") + ".");
+	                back = true;
+	                break;
+	                
+	            case "0":
+	                System.out.println("Returning to previous menu...");
+	                back = true;
+	                break;
+	                
+	            default:
+	                System.out.println("[ERROR]: Invalid input. Please enter 0 or 1.");
+	                break;
+	        }
+	    }
 	}
 }

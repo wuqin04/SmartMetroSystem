@@ -14,6 +14,10 @@ public class TrainService {
 	private final FileManager fileManager;
 	private final String fileName;
 	
+	public ArrayList<Train> getTrains() {
+		return trains;
+	}
+
 	public TrainService(FileManager fileManager, String fileName) {
 		this.fileManager = fileManager;
 		this.fileName = fileName;
@@ -187,5 +191,19 @@ public class TrainService {
 		}
 		
 		return String.format("TRN%03d", maxNum + 1);
+	}
+	
+	public Train findTrainById(String trainId) {
+		if (trainId == null || trainId.trim().isEmpty()) {
+			throw new IllegalArgumentException("[ERROR]: Train ID cannot be null or blank.");
+		}
+		
+		for (Train train : trains) {
+			if (train.getTrainId().equals(trainId)) {
+				return train;
+			}
+		}
+		
+		return null;
 	}
 }

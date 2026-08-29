@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Station {
 
     private String stationId;
@@ -59,5 +61,20 @@ public class Station {
         System.out.printf("%-14s %s%n", "Station ID:", stationId);
         System.out.printf("%-14s %s%n", "Station Name:", name);
         System.out.printf("%-14s %s%n", "Location:", location);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Station otherStation = (Station) obj;
+        return this.stationId.equals(otherStation.stationId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stationId); 
     }
 }
