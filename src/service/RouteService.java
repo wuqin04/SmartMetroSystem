@@ -25,6 +25,10 @@ public class RouteService {
         this.jsonFileManager = jsonFileManager;
         this.routeFile = routeFile;
     }
+    
+    public ArrayList<Route> getAllRoutes() {
+    	return routes;
+    }
  
     /**
      * Finds a sequence of routes connecting the requested source and destination,

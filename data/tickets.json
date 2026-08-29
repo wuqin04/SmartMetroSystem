@@ -1,0 +1,13 @@
+[
+ {
+   "ticketId": "T001",
+   "passengerId": "USER1786931068847",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
+
+]

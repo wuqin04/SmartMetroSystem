@@ -3,7 +3,7 @@ import model.Passenger;
 import enums.DiscountType;
 import java.time.LocalDate;
 import java.time.Period;
-public class DiscountEligibilityService {
+public class DiscountService {
 	private final int CHILD_MAX_AGE = 12;
 	private final int SENIOR_MAX_AGE = 60;
 	

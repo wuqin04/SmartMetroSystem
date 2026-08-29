@@ -1,4 +1,3 @@
-//view route infos
 package model;
 
 public class Route {
@@ -46,6 +45,27 @@ public class Route {
 
     public double getDistanceKm() {
         return distanceKm;
+    }
+    
+    public void setSource(Station source) {
+        if (source == null) {
+            throw new IllegalArgumentException("[ERROR]: Source station cannot be null.");
+        }
+        this.source = source;
+    }
+
+    public void setDestination(Station destination) {
+        if (destination == null) {
+            throw new IllegalArgumentException("[ERROR]: Destination station cannot be null.");
+        }
+        this.destination = destination;
+    }
+
+    public void setDistance(double distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("[ERROR]: Distance must be greater than 0.");
+        }
+        this.distanceKm = distance;
     }
 
     public double calculateDistance() {

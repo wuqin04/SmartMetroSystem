@@ -177,4 +177,42 @@ public class StationService {
 			throw new IllegalStateException("[ERROR]: Unable to load station data from " + fileName + ".", e);
 		}
 	}
+	
+	public void editStation(String stationId, String newName, String newLocation) {
+		Station station = findStationById(stationId);
+
+		boolean isUpdated = false;
+
+		if (newName != null && !newName.trim().isEmpty()) {
+			String trimmedName = newName.trim();
+			
+			if (!Character.isUpperCase(trimmedName.charAt(0))) {
+				throw new IllegalArgumentException("[ERROR]: Station name must start with a capital letter.");
+			}
+			
+			for (Station s : stations) {
+				if (s.getName().equalsIgnoreCase(trimmedName) && !s.getStationId().equals(station.getStationId())) {
+					throw new IllegalArgumentException("[ERROR]: Station name already exists.");
+				}
+			}
+			station.setName(trimmedName);
+			isUpdated = true;
+		}
+
+		if (newLocation != null && !newLocation.trim().isEmpty()) {
+			station.setLocation(newLocation.trim());
+			isUpdated = true;
+		}
+
+		if (isUpdated) {
+			try {
+				saveStations();
+				System.out.println("[SUCCESS]: Station details updated successfully.");
+			} catch (FileProcessingException e) {
+				throw new IllegalStateException("[ERROR]: Station updated but could not be saved to file.", e);
+			}
+		} else {
+			System.out.println("[INFO]: No changes were made.");
+		}
+	}
 }

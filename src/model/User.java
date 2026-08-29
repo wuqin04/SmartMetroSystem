@@ -1,5 +1,6 @@
 package model;
 
+import enums.DiscountType;
 import enums.UserRole;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -10,8 +11,10 @@ public abstract class User {
 	private String email;
 	private String password;
 	private UserRole role;
+	private boolean isSuspended;
+	private DiscountType discountType;
 	
-	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@gmail\\.com$");
 	
 	// Accessors
 	public String getUserId() {
@@ -34,6 +37,14 @@ public abstract class User {
 		return role;
 	}
 	
+	public boolean isSuspended() {
+		return isSuspended;
+	}
+	
+	public DiscountType getDiscountType() {
+	    return discountType;
+	}
+	
 	// Mutators
 	public void setUserId(String userId) {
 		this.userId = userId;
@@ -53,6 +64,14 @@ public abstract class User {
 	
 	public void setRole(UserRole role) {
 		this.role = role;
+	}
+	
+	public void setSuspended(boolean suspended) {
+		this.isSuspended = suspended;
+	}
+	
+	public void setDiscountType(DiscountType discountType) {
+	    this.discountType = discountType;
 	}
 	
 	public User(String userId, String name, String email, String password, UserRole role) {
@@ -84,10 +103,20 @@ public abstract class User {
 		this.email = email;
 		this.password = password;
 		this.role = role;
+        
+        this.isSuspended = false;
+        this.discountType = DiscountType.NONE;
 	}
 	
 	public boolean login(String email, String password) {
-		return this.email.equals(email) && this.password.equals(password);
+		if (this.email.equals(email) && this.password.equals(password)) {
+			// Check if account is suspended before allowing successful login
+			if (this.isSuspended) {
+				throw new IllegalStateException("[ERROR]: Account is suspended. Please contact the administrator.");
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	public void viewProfile() {
@@ -96,6 +125,8 @@ public abstract class User {
 		System.out.println("Name: " + this.name);
 		System.out.println("Email: " + this.email);
 		System.out.println("Role: " + this.role);
+		System.out.println("Fare Tier: " + this.discountType);
+		System.out.println("Account Status: " + (this.isSuspended ? "Suspended" : "Active"));
 		System.out.println("Password: " + this.password);
 	}
 	
@@ -112,24 +143,20 @@ public abstract class User {
 		
 		// remove the spaces from the existing name and email
 		String newName = name.strip();
-	    String newEmail = email.strip();
+        String newEmail = email.strip();
 		
-	    // to make sure name and email is not empty and match the format 
+        // to make sure name and email is not empty and match the format 
 		if(newName.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Name cannot be empty or spaces only.");
-		}
-		
-		if(!newName.matches("^[a-zA-Z]+(?: [a-zA-Z]+)")) {
-			throw new IllegalArgumentException("[ERROR]: Name can only contains letters and spaces.");
 		}
 			
 		if(newEmail.isEmpty()) {
 			throw new IllegalArgumentException("[ERROR]: Email cannot be empty or spaces only.");
 		} 
 		
-		if(!newEmail.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			throw new IllegalArgumentException("[ERROR]: Invalid email format.");
-		}
+		if (!EMAIL_PATTERN.matcher(newEmail).matches()) {
+            throw new IllegalArgumentException("[ERROR]: Invalid email format.");
+        }
 	
 		// Check whether password edit is requested
 		boolean passwordChangeRequested = currPassword != null && !currPassword.isEmpty()
@@ -156,24 +183,8 @@ public abstract class User {
 				throw new IllegalArgumentException("[ERROR]: Current password is incorrect.");
 			}
 			
-			if(newPassword.length() < 8) {
-				throw new IllegalArgumentException("[ERROR]: New password must be at least 8 characters.");
-			}
-			
 			if(newPassword.contains(" ")) {
 				throw new IllegalArgumentException("[ERROR]: New password cannot contain spaces.");
-			}
-			
-			if(!newPassword.matches(".*[A-Z].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one uppercase letter.");
-			}
-			
-			if(!newPassword.matches(".*[a-z].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one lowercase letter.");
-			}
-			
-			if(!newPassword.matches(".*[0-9].*")) {
-				throw new IllegalArgumentException("[ERROR]: New password must contain at least one number.");
 			}
 			
 			if(this.password.equals(newPassword)) {
@@ -193,26 +204,20 @@ public abstract class User {
 		this.name = newName;
 		this.email = newEmail;
 		
-		if(passwordChanged) {
+		if (passwordChanged) {
 			this.password = newPassword;
 		}
 		
-		if(nameChanged) {
-			System.out.println("Name has been changed.");
-		} else {
-			System.out.println("Name remains unchanged.");
-		}
+		if (nameChanged) {
+			System.out.println("[INFO]: Name has been changed.");
+		} 
 		
-		if(emailChanged) {
-			System.out.println("Email has been changed.");
-		} else {
-			System.out.println("Email remains unchanged.");
-		}
+		if (emailChanged) {
+			System.out.println("[INFO]: Email has been changed.");
+		} 
 		
-		if(passwordChanged) {
-			System.out.println("Password has been changed.");
-		} else {
-			System.out.println("Password remains unchanged.");
+		if (passwordChanged) {
+			System.out.println("[INFO]: Password has been changed.");
 		}
 	}
 }

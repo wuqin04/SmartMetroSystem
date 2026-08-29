@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Station {
 
     private String stationId;
@@ -39,11 +41,40 @@ public class Station {
     public void setStationId(String stationId) {
 		this.stationId = stationId;
 	}
+    
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("[ERROR]: Station name cannot be null or blank.");
+        }
+        this.name = name;
+    }
+
+    public void setLocation(String location) {
+        if (location == null || location.trim().isEmpty()) {
+            throw new IllegalArgumentException("[ERROR]: Station location cannot be null or blank.");
+        }
+        this.location = location;
+    }
 
     //Display station info
     public void displayInfo() {
-    	System.out.println("Station ID:		" + stationId);
-    	System.out.println("Station Name:	" + name);
-    	System.out.println("Location:		" + location);
+        System.out.printf("%-14s %s%n", "Station ID:", stationId);
+        System.out.printf("%-14s %s%n", "Station Name:", name);
+        System.out.printf("%-14s %s%n", "Location:", location);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        
+        if (obj == null || getClass() != obj.getClass()) return false;
+        
+        Station otherStation = (Station) obj;
+        return this.stationId.equals(otherStation.stationId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stationId); 
     }
 }

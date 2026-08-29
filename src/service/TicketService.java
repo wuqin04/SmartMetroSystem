@@ -8,6 +8,7 @@ import enums.DiscountType;
 import repository.FileManager;
 import fare.FareCalculator;
 import model.Ticket;
+import model.Train;
 import model.Passenger;
 import model.Route;
 import model.Station;
@@ -20,14 +21,16 @@ public class TicketService {
 
 	private final ArrayList<Ticket> tickets;
 	private final FareCalculator fareCalculator;
-	private final DiscountEligibilityService discountEligibilityService;
+	private final DiscountService discountEligibilityService;
 	private final FileManager fileManager;
 	private final String fileName;
 	private final UserService userService;
 	private final StationService stationService;
+	private final TrainService trainService;
 	
 	public TicketService(ArrayList<Ticket> tickets, FileManager fileManager, FareCalculator fareCalculator, 
-						DiscountEligibilityService discountEligibilityService, String fileName, UserService userService, StationService stationService) {
+						DiscountService discountEligibilityService, String fileName, UserService userService, StationService stationService, 
+						TrainService trainService) {
 		
 		if (tickets == null) {
 			throw new IllegalArgumentException("[ERROR]: Tickets cannot be null or blank.");
@@ -64,23 +67,33 @@ public class TicketService {
 		this.userService = userService;
 		this.fileManager = fileManager;
 		this.stationService = stationService;
+		this.trainService = trainService;
 		
 	}
 
-	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) throws FileProcessingException{
+	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) throws FileProcessingException {
 		if (passenger == null) {
-			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null.");
 		}
 		
 		if (route == null) {
-			throw new IllegalArgumentException("[ERROR]: Route cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Route cannot be null.");
 		}
 		
 		if (type == null) {
-			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null or blank.");
+			throw new IllegalArgumentException("[ERROR]: Ticket type cannot be null.");
 		}
 		
-		// Generate ticket ID
+		Train assignedTrain = null;
+		
+		if (type == TicketType.SINGLE) {
+			assignedTrain = getAvailableTrain();
+			
+			if (assignedTrain == null) {
+				throw new IllegalStateException("[ERROR]: All trains are currently at maximum capacity. Please try again later.");
+			}
+		}
+		
 		int ticketNumber = tickets.size() + 1;
 		String generatedId = String.format("T%03d", ticketNumber);
 		
@@ -89,30 +102,26 @@ public class TicketService {
 		
 		DiscountType discountType = discountEligibilityService.determineDiscountType(passenger);
 
-		// Calculate final fare based on ticket type and passenger eligibility.
 		double ticketFare = fareCalculator.calculateFare(route, type, discountType);
 				
-		// Check passenger balance
 		if (passenger.getBalance() < ticketFare) {
-			throw new IllegalArgumentException("[ERROR]: Passenger has insufficient balance.");
+			throw new IllegalArgumentException(String.format("[ERROR]: Insufficient balance. You need RM%.2f but only have RM%.2f", ticketFare, passenger.getBalance()));
 		}
 		
-		// Create ticket 
-		Ticket ticket = new Ticket(generatedId, passenger, source, destination, type, ticketFare);
+		Ticket ticket = new Ticket(generatedId, passenger, source, destination, assignedTrain, type, ticketFare);
+		
 		passenger.buyTicket(ticket);
 		
-		// Add the ticket into the ArrayList
 		tickets.add(ticket);
 		
 		try {
 			saveTickets();
 			userService.saveUsers();
-			System.out.printf("[SUCCESS]: Ticket purchase successful! Remaining Balance: RM%.2f\n", passenger.getBalance());
 			return ticket;
 		} catch (FileProcessingException e){
 			tickets.remove(ticket);
-			passenger.topUp(ticketFare);
-			throw new IllegalStateException("[ERROR]: Ticket purchased but could not be saved to file.", e);
+			passenger.topUp(ticketFare); 
+			throw new IllegalStateException("[ERROR]: System error. Ticket could not be saved to file. Payment refunded.", e);
 		}
 	}
 	
@@ -151,9 +160,12 @@ public class TicketService {
 			throw new IllegalArgumentException("[ERROR]: User cannot be null.");
 		}
 		
+		System.out.println("\n[VIEW TICKETS]");
+		
 		if (user.getRole() == UserRole.ADMIN) {
 			if (tickets.isEmpty()) {
-				throw new IllegalArgumentException("[ERROR]: No tickets found.");
+				System.out.println("[INFO]: No tickets found in the system.");
+				return;
 			}
 			
 			for (Ticket ticket : tickets) {
@@ -171,7 +183,7 @@ public class TicketService {
 			}
 			
 			if (!ticketFound) {
-				System.out.println("[ERROR]: Passenger has no tickets.");
+				System.out.println("[INFO]: You have no purchased tickets.");
 			} 
 			
 		} else {
@@ -185,25 +197,31 @@ public class TicketService {
 		for (int i = 0; i < tickets.size(); i++) {
 			Ticket ticket = tickets.get(i);
 			
+			String sourceIdStr = (ticket.getSource() != null) ? ticket.getSource().getStationId() : "null";
+			String destIdStr = (ticket.getDestination() != null) ? ticket.getDestination().getStationId() : "null";
+			String trainIdStr = (ticket.getTrain() != null) ? ticket.getTrain().getTrainId() : "null";
+			
 			jsonString += """
-				  {
-				    "ticketId": "%s",
-				    "passengerId": "%s",
-				    "sourceId": "%s",
-				    "destinationId": "%s",
-				    "ticketType": "%s",
-				    "ticketStatus": "%s",
-				    "fare": %s
-				  }
-			  """.formatted(
-					  ticket.getTicketId(),
-					  ticket.getPassenger().getUserId(),
-					  ticket.getSource().getStationId(),
-					  ticket.getDestination().getStationId(),
-					  ticket.getTicketType().name(),
-					  ticket.getStatus().name(),
-					  ticket.getFare()
-					  );
+					  {
+					    "ticketId": "%s",
+					    "passengerId": "%s",
+					    "sourceId": "%s",
+					    "destinationId": "%s",
+					    "trainId": "%s",
+					    "ticketType": "%s",
+					    "ticketStatus": "%s",
+					    "fare": %s
+					  }
+				  """.formatted(
+						  ticket.getTicketId(),
+						  ticket.getPassenger().getUserId(),
+						  sourceIdStr,
+						  destIdStr,
+						  trainIdStr,
+						  ticket.getTicketType().name(),
+						  ticket.getStatus().name(),
+						  ticket.getFare()
+						  );
 
 			if (i < tickets.size() - 1) {
 				jsonString += ",\n";
@@ -242,22 +260,33 @@ public class TicketService {
 
 				String ticketId = JsonUtil.extractString(block, "ticketId");
 				String passengerId = JsonUtil.extractString(block, "passengerId");
-				String sourceId = JsonUtil.extractString(block, "sourceId");
-				String destinationId = JsonUtil.extractString(block, "destinationId");
-				
 				String typeText = JsonUtil.extractString(block, "ticketType");
 				TicketType ticketType = TicketType.valueOf(typeText);
-				
 				String statusText = JsonUtil.extractString(block, "ticketStatus");
 				TicketStatus status = TicketStatus.valueOf(statusText);
-				
 				double fare = JsonUtil.extractNumber(block, "fare");
 
 				Passenger passenger = userService.findPassengerById(passengerId);
-				Station source = stationService.findStationById(sourceId);
-				Station destination = stationService.findStationById(destinationId);
 
-				Ticket ticket = new Ticket(ticketId, passenger, source, destination, ticketType, fare);
+				String sourceId = JsonUtil.extractString(block, "sourceId");
+				Station source = null;
+				if (sourceId != null && !sourceId.trim().isEmpty() && !sourceId.equals("null")) {
+					source = stationService.findStationById(sourceId);
+				}
+
+				String destinationId = JsonUtil.extractString(block, "destinationId");
+				Station destination = null;
+				if (destinationId != null && !destinationId.trim().isEmpty() && !destinationId.equals("null")) {
+					destination = stationService.findStationById(destinationId);
+				}
+				
+				String trainId = JsonUtil.extractString(block, "trainId");
+				Train train = null;
+				if (trainId != null && !trainId.trim().isEmpty() && !trainId.equals("null")) {
+					train = trainService.findTrainById(trainId); 
+				}
+
+				Ticket ticket = new Ticket(ticketId, passenger, source, destination, train, ticketType, fare);
 
 				if (status == TicketStatus.CANCELLED) {
 					ticket.cancelTicket();
@@ -274,5 +303,29 @@ public class TicketService {
 		} catch (Exception e) {
 			throw new IllegalStateException("[ERROR]: Unable to load ticket data from " + fileName + ".", e);
 		}
+	}
+	
+	private Train getAvailableTrain() {
+		ArrayList<Train> allTrains = trainService.getTrains(); 
+		
+		for (Train train : allTrains) {
+			int currentPassengerCount = 0;
+			
+			for (Ticket ticket : tickets) {
+				if (ticket.getTicketType() == enums.TicketType.SINGLE 
+					&& ticket.getStatus() == enums.TicketStatus.ACTIVE 
+					&& ticket.getTrain() != null 
+					&& ticket.getTrain().getTrainId().equals(train.getTrainId())) {
+					
+					currentPassengerCount++;
+				}
+			}
+			
+			if (currentPassengerCount < train.getCapacity()) {
+				return train;
+			}
+		}
+		
+		return null;
 	}
 }

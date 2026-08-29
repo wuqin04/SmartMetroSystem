@@ -8,6 +8,7 @@ import java.util.Locale;
 import model.User;
 import model.Passenger;
 import model.Admin;
+import enums.DiscountType;
 import enums.UserRole;
 import repository.JsonFileManager;
 import util.JsonUtil;
@@ -17,10 +18,12 @@ import exception.FileProcessingException;
 public class UserService {
 
 	private HashMap<String, User> users = new HashMap<>();
+	private ReportService reportService;
 	private JsonFileManager fileManager;
 	private String fileName;
 	
-	public UserService(JsonFileManager fileManager, String fileName) {
+	public UserService(ReportService reportService, JsonFileManager fileManager, String fileName) {
+		this.reportService = reportService;
 		
 		if (fileManager == null) {
 			throw new IllegalArgumentException(
@@ -97,17 +100,34 @@ public class UserService {
 	
 	// --- VIEW ALL ---
 	public void viewAllUsers() {
-		System.out.println("\n--- ALL REGISTERED USERS ---");
-		
-		if(users.isEmpty()){
-			System.out.println("No registered users found.");
-			System.out.println("----------------------------");
-			return;
-		}
-		for (User user : users.values()) {
-			System.out.println(user);
-		}
-		System.out.println("----------------------------");
+	    System.out.println("\n--- ALL REGISTERED USERS ---");
+	    
+	    if(users.isEmpty()){
+	        System.out.println("No registered users found.");
+	        System.out.println("----------------------------");
+	        return;
+	    }
+	    
+	    boolean passengersFound = false;
+
+	    for (User user : users.values()) {
+	        if (user.getRole() != UserRole.ADMIN) {
+	            passengersFound = true;
+	            
+	            System.out.printf("ID: %-8s | Name: %-15s | Email: %-25s | Tier: %-8s | Status: %s\n", 
+	                    user.getUserId(), 
+	                    user.getName(), 
+	                    user.getEmail(), 
+	                    user.getDiscountType(),
+	                    (user.isSuspended() ? "Suspended" : "Active"));
+	        }
+	    }
+	    
+	    if (!passengersFound) {
+	        System.out.println("No passengers found in the system.");
+	    }
+	    
+	    System.out.println("----------------------------");
 	}
 	
 	public void loadUsers() {
@@ -144,7 +164,7 @@ public class UserService {
 					
 					user = new Passenger(userId, name, email, password, UserRole.PASSENGER, balance, dateOfBirth);
 				} else if (role == UserRole.ADMIN) {
-					user = new Admin(userId, name, email, password);
+					user = new Admin(userId, name, email, password, reportService);
 				} else {
 					throw new IllegalArgumentException("[ERROR]: Invalid user role.");
 				}
@@ -183,8 +203,8 @@ public class UserService {
 								"email": "%s",
 								"password": "%s",
 								"role": "%s",
-								"balance": %s
-								"date of birth": "%s"
+								"balance": %s,
+								"dateOfBirth": "%s"
 							}
 						""".formatted(
 								p.getUserId(),
@@ -194,6 +214,25 @@ public class UserService {
 								p.getRole(),
 								p.getBalance(),
 								p.getDateOfBirth()
+								);
+			}
+			else if (user.getRole() == UserRole.ADMIN) {
+				Admin a = (Admin) user;
+				
+				jsonString += """
+							{
+								"userId": "%s",
+								"name": "%s",
+								"email": "%s",
+								"password": "%s",
+								"role": "%s"
+							}
+						""".formatted(
+								a.getUserId(),
+								a.getName(),
+								a.getEmail(),
+								a.getPassword(),
+								a.getRole()
 								);
 			}
 			
@@ -233,6 +272,58 @@ public class UserService {
 			}
 
 			throw new IllegalArgumentException("[ERROR]: Passenger ID not found: " + enteredId);
+	}
+	
+	public User searchUserByEmail(String email) {
+        if (users.containsKey(email)) {
+            return users.get(email);
+        }
+        return null;
+    }
+
+    public void setUserSuspension(String email, boolean suspend) {
+        User user = users.get(email);
+        if (user != null) {
+            user.setSuspended(suspend);
+        }
+    }
+
+    public void updateUserTier(String email, DiscountType tier) {
+        User user = users.get(email);
+        if (user != null) {
+            user.setDiscountType(tier);
+        }
+    }
+	
+	public void updateUserProfile(User user, String newName, String newEmail, String currPassword, String newPassword, String confirmPassword) throws FileProcessingException {
+		if (user == null) {
+			throw new IllegalArgumentException("[ERROR]: User cannot be null.");
+		}
+
+		String oldEmailKey = user.getEmail().trim().toLowerCase(Locale.ROOT);
+		
+		String newEmailKey = oldEmailKey;
+		if (newEmail != null && !newEmail.trim().isEmpty()) {
+			newEmailKey = newEmail.trim().toLowerCase(Locale.ROOT);
+		}
+
+		if (!oldEmailKey.equals(newEmailKey) && users.containsKey(newEmailKey)) {
+			throw new IllegalArgumentException("[ERROR]: The new email is already in use by another account.");
+		}
+
+		user.editProfile(newName, newEmail, currPassword, newPassword, confirmPassword);
+
+		if (!oldEmailKey.equals(newEmailKey)) {
+			users.remove(oldEmailKey);
+			users.put(newEmailKey, user);
+		}
+
+		try {
+			saveUsers();
+			System.out.println("[SUCCESS]: Profile updated and saved successfully.");
+		} catch (FileProcessingException e) {
+			throw new IllegalStateException("[ERROR]: Profile updated but could not be saved to file.", e);
+		}
 	}
 }	
 	

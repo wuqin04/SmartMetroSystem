@@ -1,10 +1,11 @@
 [
 	{
-		"userId": "USER1786096422569",
-		"name": "wuqin",
+		"userId": "USER1786931068847",
+		"name": "Tan Wei Jian",
 		"email": "wuqin@gmail.com",
 		"password": "123",
 		"role": "PASSENGER",
+<<<<<<< HEAD
 		"balance": 0.0
 	}
 ,
@@ -35,14 +36,28 @@
 		"password": "123",
 		"role": "PASSENGER",
 		"balance": 0.0
+=======
+		"balance": 7.8599997044,
+		"dateOfBirth": "2006-04-19"
+>>>>>>> branch 'main' of https://github.com/wuqin04/SmartMetroSystem.git
 	}
 ,
 	{
 		"userId": "ADMIN001",
-		"name": "admin",
-		"email": "admin@gmail.com",
+		"name": "sasuke",
+		"email": "sasuke@gmail.com",
 		"password": "admin",
-		"role": "ADMIN",
-		"balance": 0.0
+		"role": "ADMIN"
 	}
+,
+	{
+		"userId": "USER1787823050919",
+		"name": "serene",
+		"email": "serene@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0,
+		"dateOfBirth": "2025-04-19"
+	}
+
 ]

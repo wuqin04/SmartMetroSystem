@@ -1,6 +1,9 @@
 package app;
 
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 import ui.PassengerUI;
@@ -21,7 +24,9 @@ import repository.JsonFileManager;
 import service.UserService;
 import service.TicketService;
 import service.TrainService;
+import service.DiscountService;
 import service.PaymentService;
+import service.ReportService;
 import service.RouteService;
 import service.StationService;
 
@@ -44,11 +49,14 @@ public class Main {
 		ArrayList<Ticket> 			tickets 		= new ArrayList<Ticket>();
 		ArrayList<Route>			routes			= new ArrayList<Route>();
 		
+		ReportService				reportService  	= new ReportService(tickets);
 		StationService				stationService  = new StationService(jsonFM, stationFile);
-		UserService 				userService     = new UserService(jsonFM, userFile);
-		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, ticketFile, userService, stationService);
+		UserService 				userService     = new UserService(reportService, jsonFM, userFile);
+		DiscountService				discountService = new DiscountService();
 		RouteService				routeService	= new RouteService(routes, jsonFM, routeFile);
 		TrainService                trainService    = new TrainService(jsonFM, trainFile); 
+		TicketService 				ticketService	= new TicketService(tickets, jsonFM, stdFareCalc, discountService, 
+														ticketFile, userService, stationService, trainService);
 		PaymentService              paymentService  = new PaymentService(jsonFM, paymentFile);
 		
 		// load all data
@@ -59,8 +67,8 @@ public class Main {
 		routeService.loadRoutes();  
 		ticketService.loadTickets();
 		
-		PassengerUI 				passengerUI 	= new PassengerUI(sc, ticketService, routeService);
-		AdminUI 					adminUI			= new AdminUI(sc, routeService, stationService, routes);
+		PassengerUI 				passengerUI 	= new PassengerUI(sc, userService, ticketService, routeService, stationService);
+		AdminUI 					adminUI			= new AdminUI(sc, userService, routeService, stationService, trainService, routes);
 		
 		String choice = "";
 		
@@ -106,16 +114,12 @@ public class Main {
 			System.out.print("Enter your email: ");
 			String email = sc.nextLine();
 			
-			if (email.equalsIgnoreCase("99")) {
-				return;
-			}
+			if (email.equalsIgnoreCase("99")) return;
 			
 			System.out.print("Enter your password: ");
 			String password = sc.nextLine().trim();
 			
-			if (password.equalsIgnoreCase("99")) {
-				return;	
-			}
+			if (password.equalsIgnoreCase("99")) return;
 			
 			try {
 				User loggedInUser = us.login(email, password);
@@ -139,27 +143,58 @@ public class Main {
 	public static void registerMenu(Scanner sc, UserService us) {
 		
 		System.out.println("\n[REGISTER PAGE]");
+		System.out.println("Enter 99 to return to the main menu.");
 		
-		System.out.print("Create your name: ");
-		String name = sc.nextLine().trim();
+		boolean isSuccess = false;
 		
-		System.out.print("Enter your email: ");
-		String email = sc.nextLine().trim();
-		
-		System.out.print("Create your password: ");
-		String password = sc.nextLine().trim();
-		
-		String userId = "USER" + System.currentTimeMillis();
-		
-		try {
-			Passenger passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0);
-			us.registerUser(passenger);
-						
-			System.out.println("[SUCCESS]: Register successfully!");
-		} catch (IllegalArgumentException e) {
-			System.out.print("Register Failed!\n" + e.getMessage());
-		} catch (Exception e) {
-			System.out.println("Register Failed!\n" + e.getMessage());
+		while (!isSuccess) {
+			System.out.print("Create your name: ");
+			String name = sc.nextLine().trim();
+			
+			if (name.equalsIgnoreCase("99")) return;
+			
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			LocalDate birthDate = null;
+			
+			while (birthDate == null) {
+				System.out.print("Enter your birth date (dd/MM/yyyy): ");
+				String birthString = sc.nextLine().trim();
+				
+				if (birthString.equalsIgnoreCase("99")) return;
+				
+				try {
+					birthDate = LocalDate.parse(birthString, formatter);
+				} catch (DateTimeParseException e) {
+					System.out.println("[ERROR]: Invalid format or date. Try again.");
+				}
+			}
+			
+			
+			System.out.print("Enter your email: ");
+			String email = sc.nextLine().trim();
+			
+			if (email.equalsIgnoreCase("99")) return;
+			
+			System.out.print("Create your password: ");
+			String password = sc.nextLine().trim();
+			
+			if (password.equalsIgnoreCase("99")) return;
+			
+			String userId = "USER" + System.currentTimeMillis();
+					;
+			
+			try {
+				Passenger passenger = new Passenger(userId, name, email, password, UserRole.PASSENGER, 0, birthDate);
+				us.registerUser(passenger);
+							
+				System.out.println("[SUCCESS]: Register successfully!");
+				
+				isSuccess = true;
+			} catch (IllegalArgumentException e) {
+				System.out.println(e.getMessage());
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
 		}
 	}
 }

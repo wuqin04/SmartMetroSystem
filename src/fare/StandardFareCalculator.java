@@ -34,26 +34,28 @@ public class StandardFareCalculator implements FareCalculator {
 		
 		double fare;
 		
-		if(ticketType == TicketType.SINGLE) {
+		if (ticketType == TicketType.SINGLE) {
 			fare = BASE_FARE + (distance * RATE_PER_KM);
-		}else if(ticketType == TicketType.DAILY){
+		} 
+		else if(ticketType == TicketType.DAILY){
 			fare = DAILY_FARE;
-		}else if(ticketType == TicketType.MONTHLY) {
+		}
+		else if(ticketType == TicketType.MONTHLY) {
 			fare = MONTHLY_FARE; 
 		}else {
 			throw new IllegalArgumentException("[ERROR]: Invalid ticket type.");
 		}
 		
-		if(ticketType == TicketType.SINGLE) {
+		if (ticketType == TicketType.SINGLE) {
 			
-			if(discountType == DiscountType.CHILD || discountType == DiscountType.SENIOR) {
+			if(discountType != DiscountType.NONE) {
 				fare /= 2;
 			}
 		}
 		
 		double finalFare = Math.round(fare * 100.0) / 100.0;
 		
-		if(finalFare <= 0) {
+		if (finalFare <= 0) {
 			throw new IllegalArgumentException("[ERROR]: Calculated fare must be greater than RM0.00.");
 		}
 		
