@@ -5,8 +5,41 @@
 		"email": "wuqin@gmail.com",
 		"password": "123",
 		"role": "PASSENGER",
+<<<<<<< HEAD
+		"balance": 0.0
+	}
+,
+,
+	{
+		"userId": "USER1786323684875",
+		"name": "dennis",
+		"email": "dennis@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0
+	}
+,
+	{
+		"userId": "USER1786339882007",
+		"name": "Dennis",
+		"email": "dennisyihin@gmail.com",
+		"password": "dennis123",
+		"role": "PASSENGER",
+		"balance": 0.0
+	}
+,
+,
+	{
+		"userId": "USER1786096437063",
+		"name": "serene",
+		"email": "serene@gmail.com",
+		"password": "123",
+		"role": "PASSENGER",
+		"balance": 0.0
+=======
 		"balance": 7.8599997044,
 		"dateOfBirth": "2006-04-19"
+>>>>>>> branch 'main' of https://github.com/wuqin04/SmartMetroSystem.git
 	}
 ,
 	{
