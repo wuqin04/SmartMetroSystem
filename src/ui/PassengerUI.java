@@ -10,6 +10,7 @@ import fare.StandardFareCalculator;
 import model.Passenger;
 import model.Route;
 import model.Station;
+import model.Ticket;
 import payment.Payment;
 import payment.WalletPayment;
 import payment.CardPayment;
@@ -251,106 +252,114 @@ public class PassengerUI {
 	}
 	
 	private void buyTicketAction(Passenger passenger) {
-		StandardFareCalculator fareCalculator = new StandardFareCalculator();
-		
-		while (true) {
-			System.out.println("\n[BUY TICKET]");
-		    System.out.println("Choose your ticket type:");
-		    System.out.println("(1) Single Trip (Calculated by distance)");
-		    System.out.println("(2) Daily Pass (RM10.00)");
-		    System.out.println("(3) Monthly Pass (RM50.00)");
-		    System.out.println("(0) Back to Ticket Menu");
-		    System.out.print("Enter your choice: ");
-		    
-		    String ticketChoice = sc.nextLine().trim();
-		    
-		    if (ticketChoice.equals("0")) {
-		    	return;
-		    }
-		    
-		    TicketType selectedType = null;
-		    Station source = null;
-		    Station destination = null;
-		    Route fullRoute = null; 
-		    double totalDistance = 0.0;
-		    double fare = 0.0;
-		    
-		    switch (ticketChoice) {
-		        case "1":
-		            selectedType = TicketType.SINGLE;
-		            
-		            ArrayList<Station> allStations = stationService.getAllStations();
-		            
-		            if (allStations == null || allStations.isEmpty()) {
-		            	System.out.println("[ERROR]: No stations available in the system.");
-		            	continue;
-		            }
-		            
-		            System.out.println("\n[AVAILABLE STATIONS]");
-		            for (int i = 0; i < allStations.size(); i++) {
-		            	System.out.printf("(%d) %s\n", (i + 1), allStations.get(i).getName());
-		            }
-		            
-		            try {
-			            System.out.print("Select Source Station (Number): ");
-			            int srcChoice = Integer.parseInt(sc.nextLine().trim());
-			            source = allStations.get(srcChoice - 1);
-			            
-			            System.out.print("Select Destination Station (Number): ");
-			            int destChoice = Integer.parseInt(sc.nextLine().trim());
-			            destination = allStations.get(destChoice - 1);
-			            
-			            if (source.getStationId().equals(destination.getStationId())) {
-			            	System.out.println("[ERROR]: Source and destination cannot be the same.");
-			            	continue;
-			            }
-			            
-			            ArrayList<Route> routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
-			            
-			            if (routes == null || routes.isEmpty()) {
-			            	System.out.println("[ERROR]: No connecting routes found between these stations.");
-			            	continue;
-			            }
-			            
-		            	for (Route route : routes) {
-		            		totalDistance += route.calculateDistance();
-		            	}
-		            	
-		            	fullRoute = new Route("R-TEMP", source, destination, totalDistance);
-		            	
-		            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-		            	System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
-		            	continue;
-		            } catch (IllegalArgumentException e) {
-		            	System.out.println(e.getMessage());
-		            	continue;
-		            }   
-		            break;
-		            
-		        case "2":
-		            selectedType = TicketType.DAILY;
-		            fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
-		            break;
-		            
-		        case "3":
-		            selectedType = TicketType.MONTHLY;
-		            fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
-		            break;
-		            
-		        default:
-		            System.out.println("[ERROR]: Invalid ticket type.");
-		            continue;
-		    }
-		    
-		    try {
-		    	fare = fareCalculator.calculateFare(fullRoute, selectedType, passenger.getDiscountType());
-		    } catch (IllegalArgumentException e) {
-		    	System.out.println(e.getMessage());
-		    	continue;
-		    }
-		    
-		    // Proceed to Checkout
-		    System.out.println("\n[ORDER SUMMARY]");
+	    StandardFareCalculator fareCalculator = new StandardFareCalculator();
+	    
+	    while (true) {
+	        System.out.println("\n[BUY TICKET]");
+	        System.out.println("Choose your ticket type:");
+	        System.out.println("(1) Single Trip (Calculated by distance)");
+	        System.out.println("(2) Daily Pass (RM10.00)");
+	        System.out.println("(3) Monthly Pass (RM50.00)");
+	        System.out.println("(0) Back to Ticket Menu");
+	        System.out.print("Enter your choice: ");
+	        
+	        String ticketChoice = sc.nextLine().trim();
+	        
+	        if (ticketChoice.equals("0")) {
+	            return;
+	        }
+
+	        if (ticketChoice.equals("2") || ticketChoice.equals("3")) {
+	            
+	            if (ticketService.hasActivePass(passenger)) {
+	                System.out.println("[ERROR]: You already own an active Daily or Monthly Pass. You can only hold one at a time.");
+	                continue;
+	            }
+	        }
+	        
+	        TicketType selectedType = null;
+	        Station source = null;
+	        Station destination = null;
+	        Route fullRoute = null; 
+	        double totalDistance = 0.0;
+	        double fare = 0.0;
+	        
+	        switch (ticketChoice) {
+	            case "1":
+	                selectedType = TicketType.SINGLE;
+	                
+	                ArrayList<Station> allStations = stationService.getAllStations();
+	                
+	                if (allStations == null || allStations.isEmpty()) {
+	                    System.out.println("[ERROR]: No stations available in the system.");
+	                    continue;
+	                }
+	                
+	                System.out.println("\n[AVAILABLE STATIONS]");
+	                for (int i = 0; i < allStations.size(); i++) {
+	                    System.out.printf("(%d) %s\n", (i + 1), allStations.get(i).getName());
+	                }
+	                
+	                try {
+	                    System.out.print("Select Source Station (Number): ");
+	                    int srcChoice = Integer.parseInt(sc.nextLine().trim());
+	                    source = allStations.get(srcChoice - 1);
+	                    
+	                    System.out.print("Select Destination Station (Number): ");
+	                    int destChoice = Integer.parseInt(sc.nextLine().trim());
+	                    destination = allStations.get(destChoice - 1);
+	                    
+	                    if (source.getStationId().equals(destination.getStationId())) {
+	                        System.out.println("[ERROR]: Source and destination cannot be the same.");
+	                        continue;
+	                    }
+	                    
+	                    ArrayList<Route> routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
+	                    
+	                    if (routes == null || routes.isEmpty()) {
+	                        System.out.println("[ERROR]: No connecting routes found between these stations.");
+	                        continue;
+	                    }
+	                    
+	                    for (Route route : routes) {
+	                        totalDistance += route.calculateDistance();
+	                    }
+	                    
+	                    fullRoute = new Route("R-TEMP", source, destination, totalDistance);
+	                    
+	                } catch (NumberFormatException | IndexOutOfBoundsException e) {
+	                    System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
+	                    continue;
+	                } catch (IllegalArgumentException e) {
+	                    System.out.println(e.getMessage());
+	                    continue;
+	                }   
+	                break;
+	                
+	            case "2":
+	                selectedType = TicketType.DAILY;
+	                fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
+	                break;
+	                
+	            case "3":
+	                selectedType = TicketType.MONTHLY;
+	                fullRoute = new Route("PASS", new Station("D1", "SYS", "SYS"), new Station("D2", "SYS", "SYS"), 1.0);
+	                break;
+	                
+	            default:
+	                System.out.println("[ERROR]: Invalid ticket type.");
+	                continue;
+	        }
+	        
+	        try {
+	            fare = fareCalculator.calculateFare(fullRoute, selectedType, passenger.getDiscountType());
+	        } catch (IllegalArgumentException e) {
+	            System.out.println(e.getMessage());
+	            continue;
+	        }
+	        
+	        // Proceed to Checkout
+	        System.out.println("\n[ORDER SUMMARY]");
 	        System.out.println("Ticket Type   : " + selectedType);
 	        if (selectedType == TicketType.SINGLE) {
 	            System.out.println("Route         : " + source.getName() + " -> " + destination.getName());
@@ -361,58 +370,59 @@ public class PassengerUI {
 	        System.out.print("Confirm purchase? (Y/N): ");
 	        String confirm = sc.nextLine().trim();
 	        
-        	if (confirm.equalsIgnoreCase("Y")) {
-        		boolean paymentSuccess = false;
-        		
-        		while (!paymentSuccess) {
-        			System.out.println("\n[PAYMENT METHOD]");
-		            System.out.println("(1) Cash");
-		            System.out.println("(2) Card");
-		            System.out.printf("(3) Metro Wallet (Current Balance: RM%.2f)\n", passenger.getBalance());
-		            System.out.println("(0) Cancel Payment");
-		            System.out.print("Enter your choice: ");
-		            
-		            String payOption = sc.nextLine().trim();
-		            Payment paymentMethod = null;
-		            
-		            if (payOption.equals("0")) {
-		            	System.out.println("Payment cancelled.");
-		            	break; 
-		            }
-		            
-		            switch (payOption) {
-			            case "1":
-			            	paymentMethod = new CashPayment();
-			            	break;
-			            case "2":
-			            	System.out.print("Enter 16-Digit Card Number: ");
-			            	String cardNum = sc.nextLine().trim();
-			            	paymentMethod = new CardPayment(cardNum);
-			            	break;
-			            case "3":
-			            	paymentMethod = new WalletPayment(passenger);
-			            	break;
-			            default:
-			                System.out.println("[ERROR]: Invalid payment option selected.");
-			                continue; 
-		            }
-		            
-		            try {
-		                if (paymentMethod.pay(fare)) {
-		                    try {
-								ticketService.buyTicket(passenger, fullRoute, selectedType);
-								paymentSuccess = true;
-							} catch (Exception e) { 
-								System.out.println(e.getMessage());
-							}
-		                }
-		            } catch (IllegalArgumentException e) {
-		                System.out.println(e.getMessage()); 
-		            }
-		        }
-        	} else {
-        		System.out.println("Purchase cancelled. Returning to menu...");
-        	}
+	        if (confirm.equalsIgnoreCase("Y")) {
+	            boolean paymentSuccess = false;
+	            
+	            while (!paymentSuccess) {
+	                System.out.println("\n[PAYMENT METHOD]");
+	                System.out.println("(1) Cash");
+	                System.out.println("(2) Card");
+	                System.out.printf("(3) Metro Wallet (Current Balance: RM%.2f)\n", passenger.getBalance());
+	                System.out.println("(0) Cancel Payment");
+	                System.out.print("Enter your choice: ");
+	                
+	                String payOption = sc.nextLine().trim();
+	                Payment paymentMethod = null;
+	                
+	                if (payOption.equals("0")) {
+	                    System.out.println("Payment cancelled.");
+	                    break; 
+	                }
+	                
+	                switch (payOption) {
+	                    case "1":
+	                        paymentMethod = new CashPayment();
+	                        break;
+	                    case "2":
+	                        System.out.print("Enter 16-Digit Card Number: ");
+	                        String cardNum = sc.nextLine().trim();
+	                        paymentMethod = new CardPayment(cardNum);
+	                        break;
+	                    case "3":
+	                        paymentMethod = new WalletPayment(passenger);
+	                        break;
+	                    default:
+	                        System.out.println("[ERROR]: Invalid payment option selected.");
+	                        continue; 
+	                }
+	                
+	                try {
+	                    if (paymentMethod.pay(fare)) {
+	                        try {
+	                            ticketService.buyTicket(passenger, fullRoute, selectedType);
+	                            paymentSuccess = true;
+	                            System.out.println("[SUCCESS]: Ticket purchased successfully!");
+	                        } catch (Exception e) { 
+	                            System.out.println(e.getMessage());
+	                        }
+	                    }
+	                } catch (IllegalArgumentException e) {
+	                    System.out.println(e.getMessage()); 
+	                }
+	            }
+	        } else {
+	            System.out.println("Purchase cancelled. Returning to menu...");
+	        }
 	    }
 	}
 	

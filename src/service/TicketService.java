@@ -15,7 +15,7 @@ import model.Station;
 import model.User;
 import exception.FileProcessingException;
 import exception.TicketNotFoundException;
-import util.JsonUtil; // <-- Imported your new Utility class
+import util.JsonUtil;
 
 public class TicketService {
 
@@ -71,6 +71,18 @@ public class TicketService {
 		
 	}
 
+	public boolean hasActivePass(Passenger passenger) {
+		for (Ticket t : tickets) {
+			if (t.getPassenger().getUserId().equals(passenger.getUserId())) {
+				if ((t.getTicketType() == TicketType.DAILY || t.getTicketType() == TicketType.MONTHLY) 
+						&& t.getStatus() == TicketStatus.ACTIVE) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public Ticket buyTicket(Passenger passenger, Route route, TicketType type) throws FileProcessingException {
 		if (passenger == null) {
 			throw new IllegalArgumentException("[ERROR]: Passenger cannot be null.");
@@ -101,16 +113,9 @@ public class TicketService {
 		Station destination = route.getDestination();
 		
 		DiscountType discountType = discountEligibilityService.determineDiscountType(passenger);
-
 		double ticketFare = fareCalculator.calculateFare(route, type, discountType);
-				
-		if (passenger.getBalance() < ticketFare) {
-			throw new IllegalArgumentException(String.format("[ERROR]: Insufficient balance. You need RM%.2f but only have RM%.2f", ticketFare, passenger.getBalance()));
-		}
 		
 		Ticket ticket = new Ticket(generatedId, passenger, source, destination, assignedTrain, type, ticketFare);
-		
-		passenger.buyTicket(ticket);
 		
 		tickets.add(ticket);
 		
@@ -120,8 +125,7 @@ public class TicketService {
 			return ticket;
 		} catch (FileProcessingException e){
 			tickets.remove(ticket);
-			passenger.topUp(ticketFare); 
-			throw new IllegalStateException("[ERROR]: System error. Ticket could not be saved to file. Payment refunded.", e);
+			throw new IllegalStateException("[ERROR]: System error. Ticket could not be saved to file.", e);
 		}
 	}
 	
@@ -156,39 +160,41 @@ public class TicketService {
 	}
 	
 	public void viewTickets(User user) {
-		if (user == null) {
-			throw new IllegalArgumentException("[ERROR]: User cannot be null.");
-		}
-		
-		System.out.println("\n[VIEW TICKETS]");
-		
-		if (user.getRole() == UserRole.ADMIN) {
-			if (tickets.isEmpty()) {
-				System.out.println("[INFO]: No tickets found in the system.");
-				return;
-			}
-			
-			for (Ticket ticket : tickets) {
-				ticket.printTicket();
-			}
-			
-		} else if (user.getRole() == UserRole.PASSENGER) {
-			boolean ticketFound = false;
-	
-			for (Ticket ticket : tickets) {
-				if (ticket.getPassenger().getUserId().equals(user.getUserId())) {
-					ticket.printTicket();
-					ticketFound = true;
-				}
-			}
-			
-			if (!ticketFound) {
-				System.out.println("[INFO]: You have no purchased tickets.");
-			} 
-			
-		} else {
-			throw new IllegalArgumentException("[ERROR]: Invalid user role.");
-		}
+	    if (user == null) {
+	        throw new IllegalArgumentException("[ERROR]: User cannot be null.");
+	    }
+	    
+	    System.out.println("\n----------------- TICKET DETAILS -----------------");
+	    
+	    if (user.getRole() == UserRole.ADMIN) {
+	        if (tickets.isEmpty()) {
+	            System.out.println("[INFO]: No tickets found in the system.");
+	            System.out.println("--------------------------------------------------");
+	            return;
+	        }
+	        
+	        for (Ticket ticket : tickets) {
+	            ticket.printTicket();
+	        }
+	        
+	    } else if (user.getRole() == UserRole.PASSENGER) {
+	        boolean ticketFound = false;
+
+	        for (Ticket ticket : tickets) {
+	            if (ticket.getPassenger().getUserId().equals(user.getUserId())) {
+	                ticket.printTicket();
+	                ticketFound = true;
+	            }
+	        }
+	        
+	        if (!ticketFound) {
+	            System.out.println("[INFO]: You have no purchased tickets.");
+	            System.out.println("--------------------------------------------------");
+	        } 
+	        
+	    } else {
+	        throw new IllegalArgumentException("[ERROR]: Invalid user role.");
+	    }
 	}
 	
 	public void saveTickets() throws FileProcessingException {
@@ -241,68 +247,74 @@ public class TicketService {
 	}
 	
 	public void loadTickets() {
-		try {
-			Object loadedData = fileManager.loadData(fileName);
+	    try {
+	        Object loadedData = fileManager.loadData(fileName);
 
-			if (loadedData == null) return;
-			
-			String jsonString = String.valueOf(loadedData).trim();
-			
-        	if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
+	        if (loadedData == null) return;
+	        
+	        String jsonString = String.valueOf(loadedData).trim();
+	        
+	        if (jsonString.isEmpty() || jsonString.replaceAll("\\s+", "").equals("[]")) return;
 
-			tickets.clear();
-			String[] blocks = jsonString.split("}");
+	        tickets.clear();
+	        String[] blocks = jsonString.split("}");
 
-			for (String block : blocks) {
-				if (block.trim().isEmpty() || block.trim().equals("]")) {
-					continue;
-				}
+	        for (String block : blocks) {
+	            if (block.trim().isEmpty() || block.trim().equals("]")) {
+	                continue;
+	            }
 
-				String ticketId = JsonUtil.extractString(block, "ticketId");
-				String passengerId = JsonUtil.extractString(block, "passengerId");
-				String typeText = JsonUtil.extractString(block, "ticketType");
-				TicketType ticketType = TicketType.valueOf(typeText);
-				String statusText = JsonUtil.extractString(block, "ticketStatus");
-				TicketStatus status = TicketStatus.valueOf(statusText);
-				double fare = JsonUtil.extractNumber(block, "fare");
+	            String ticketId = JsonUtil.extractString(block, "ticketId");
+	            String passengerId = JsonUtil.extractString(block, "passengerId");
+	            String typeText = JsonUtil.extractString(block, "ticketType");
+	            TicketType ticketType = TicketType.valueOf(typeText);
+	            String statusText = JsonUtil.extractString(block, "ticketStatus");
+	            TicketStatus status = TicketStatus.valueOf(statusText);
+	            double fare = JsonUtil.extractNumber(block, "fare");
 
-				Passenger passenger = userService.findPassengerById(passengerId);
+	            Passenger passenger = userService.findPassengerById(passengerId);
 
-				String sourceId = JsonUtil.extractString(block, "sourceId");
-				Station source = null;
-				if (sourceId != null && !sourceId.trim().isEmpty() && !sourceId.equals("null")) {
-					source = stationService.findStationById(sourceId);
-				}
+	            Station source = null;
+	            Station destination = null;
 
-				String destinationId = JsonUtil.extractString(block, "destinationId");
-				Station destination = null;
-				if (destinationId != null && !destinationId.trim().isEmpty() && !destinationId.equals("null")) {
-					destination = stationService.findStationById(destinationId);
-				}
-				
-				String trainId = JsonUtil.extractString(block, "trainId");
-				Train train = null;
-				if (trainId != null && !trainId.trim().isEmpty() && !trainId.equals("null")) {
-					train = trainService.findTrainById(trainId); 
-				}
+	            if (ticketType == TicketType.DAILY || ticketType == TicketType.MONTHLY) {
+	                source = new Station("D1", "SYS", "SYS");
+	                destination = new Station("D2", "SYS", "SYS");
+	            } else {
+	                String sourceId = JsonUtil.extractString(block, "sourceId");
+	                if (sourceId != null && !sourceId.trim().isEmpty() && !sourceId.equals("null")) {
+	                    source = stationService.findStationById(sourceId);
+	                }
 
-				Ticket ticket = new Ticket(ticketId, passenger, source, destination, train, ticketType, fare);
+	                String destinationId = JsonUtil.extractString(block, "destinationId");
+	                if (destinationId != null && !destinationId.trim().isEmpty() && !destinationId.equals("null")) {
+	                    destination = stationService.findStationById(destinationId);
+	                }
+	            }
+	            
+	            String trainId = JsonUtil.extractString(block, "trainId");
+	            Train train = null;
+	            if (trainId != null && !trainId.trim().isEmpty() && !trainId.equals("null")) {
+	                train = trainService.findTrainById(trainId); 
+	            }
 
-				if (status == TicketStatus.CANCELLED) {
-					ticket.cancelTicket();
-				} 
-				else if (status == TicketStatus.USED) {
-					ticket.useTicket();
-				}
-				
-				tickets.add(ticket);
-			}
-			
-		} catch (FileProcessingException e) {
-			System.out.println("[INFO]: No existing tickets found. Starting fresh.");
-		} catch (Exception e) {
-			throw new IllegalStateException("[ERROR]: Unable to load ticket data from " + fileName + ".", e);
-		}
+	            Ticket ticket = new Ticket(ticketId, passenger, source, destination, train, ticketType, fare);
+
+	            if (status == TicketStatus.CANCELLED) {
+	                ticket.cancelTicket();
+	            } 
+	            else if (status == TicketStatus.USED) {
+	                ticket.useTicket();
+	            }
+	            
+	            tickets.add(ticket);
+	        }
+	        
+	    } catch (FileProcessingException e) {
+	        System.out.println("[INFO]: No existing tickets found. Starting fresh.");
+	    } catch (Exception e) {
+	        throw new IllegalStateException("[ERROR]: Unable to load ticket data from " + fileName + ".", e);
+	    }
 	}
 	
 	private Train getAvailableTrain() {

@@ -105,39 +105,42 @@ public class Main {
 	
 	public static void loginMenu(Scanner sc, UserService us, PassengerUI passengerUI, AdminUI adminUI) {
 		
-		System.out.println("\n[LOGIN PAGE]");
-		System.out.println("Enter 99 to return to the main menu.");
-		
-		boolean isSuccess = false;
-		
-		while (!isSuccess) {
-			System.out.print("Enter your email: ");
-			String email = sc.nextLine();
-			
-			if (email.equalsIgnoreCase("99")) return;
-			
-			System.out.print("Enter your password: ");
-			String password = sc.nextLine().trim();
-			
-			if (password.equalsIgnoreCase("99")) return;
-			
-			try {
-				User loggedInUser = us.login(email, password);
-				isSuccess = true;
-				
-				System.out.printf("[SUCCESS]: Welcome back, %s!\n", loggedInUser.getName());
-				
-				if (loggedInUser.getRole() == UserRole.PASSENGER) {
-					passengerUI.loadDashboard((Passenger)loggedInUser);
-				}
-				else if (loggedInUser.getRole() == UserRole.ADMIN) {
-					adminUI.loadDashboard((Admin)loggedInUser);
-				}
-			} catch (InvalidLoginException e) {
-				System.out.println("Login Failed!\n" + e.getMessage());
-				System.out.println("Please try again.\n");
-			}
-		}
+	    System.out.println("\n[LOGIN PAGE]");
+	    System.out.println("Enter 99 to return to the main menu.");
+	    
+	    boolean isSuccess = false;
+	    
+	    while (!isSuccess) {
+	        System.out.print("Enter your email: ");
+	        String email = sc.nextLine();
+	        
+	        if (email.equalsIgnoreCase("99")) return;
+	        
+	        System.out.print("Enter your password: ");
+	        String password = sc.nextLine().trim();
+	        
+	        if (password.equalsIgnoreCase("99")) return;
+	        
+	        try {
+	            User loggedInUser = us.login(email, password);
+	            isSuccess = true;
+	            
+	            System.out.printf("[SUCCESS]: Welcome back, %s!\n", loggedInUser.getName());
+	            
+	            if (loggedInUser.getRole() == UserRole.PASSENGER) {
+	                passengerUI.loadDashboard((Passenger)loggedInUser);
+	            }
+	            else if (loggedInUser.getRole() == UserRole.ADMIN) {
+	                adminUI.loadDashboard((Admin)loggedInUser);
+	            }
+	        } catch (InvalidLoginException e) {
+	            System.out.println("Login Failed!\n" + e.getMessage());
+	            System.out.println("Please try again.\n");
+	        } catch (IllegalStateException e) {
+	            System.out.println("Login Failed!\n" + e.getMessage());
+	            System.out.println("Please try again with a different account or type 99 to exit.\n");
+	        }
+	    }
 	}
 	
 	public static void registerMenu(Scanner sc, UserService us) {

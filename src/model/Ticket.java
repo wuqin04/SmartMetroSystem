@@ -114,29 +114,29 @@ public class Ticket {
 		this.ticketStatus = TicketStatus.ACTIVE; 
 	}
 	
-	public void printTicket(){
-		System.out.println("\n--- TICKET DETAILS ---");
-		System.out.println("Ticket ID: " + ticketId);
-		System.out.println("Passenger name: " + passenger.getName());
-		
-		if (ticketType == TicketType.SINGLE && source != null && destination != null) {
-			System.out.println("Source station name: " + source.getName());
-			System.out.println("Destination station name: " + destination.getName());
-			
-			if (train != null) {
-				System.out.println("Train: " + train.getTrainName());
-			}
-			
-		} else if (ticketType == TicketType.DAILY) {
-			System.out.println("Route: Daily Pass (All Stations)");
-		} else if (ticketType == TicketType.MONTHLY) {
-			System.out.println("Route: Monthly Pass (All Stations)");
-		}
-		
-		System.out.println("Ticket type: " + ticketType);
-		System.out.printf("Fare: RM %.2f%n", fare);
-		System.out.println("Ticket status: " + ticketStatus);
-		System.out.println("----------------------");
+	public void printTicket() {	    
+	    System.out.printf("%-25s: %s%n", "Ticket ID", ticketId);
+	    System.out.printf("%-25s: %s%n", "Passenger name", passenger.getName());
+	    
+	    if (ticketType == TicketType.SINGLE && source != null && destination != null) {
+	        System.out.printf("%-25s: %s%n", "Source station name", source.getName());
+	        System.out.printf("%-25s: %s%n", "Destination station name", destination.getName());
+	        
+	        if (train != null) {
+	            System.out.printf("%-25s: %s%n", "Train", train.getTrainName());
+	        }
+	        
+	    } else if (ticketType == TicketType.DAILY) {
+	        System.out.printf("%-25s: %s%n", "Route", "Daily Pass (All Stations)");
+	    } else if (ticketType == TicketType.MONTHLY) {
+	        System.out.printf("%-25s: %s%n", "Route", "Monthly Pass (All Stations)");
+	    }
+	    
+	    System.out.printf("%-25s: %s%n", "Ticket type", ticketType);
+	    System.out.printf("%-25s: RM %.2f%n", "Fare", fare);
+	    System.out.printf("%-25s: %s%n", "Ticket status", ticketStatus);
+	    
+	    System.out.println("--------------------------------------------------");
 	}
 	
 	// Function for cancel ticket
