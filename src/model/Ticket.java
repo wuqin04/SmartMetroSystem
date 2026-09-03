@@ -1,6 +1,9 @@
 package model;
+
 import enums.TicketStatus;
 import enums.TicketType;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Ticket {
 	
@@ -12,6 +15,7 @@ public class Ticket {
 	private TicketType ticketType;
 	private TicketStatus ticketStatus;
 	private double fare;
+	private LocalDateTime purchaseTime;
 	
 	public String getTicketId(){
 		return ticketId;
@@ -43,6 +47,32 @@ public class Ticket {
 	
 	public double getFare(){
 		return fare;
+	}
+	
+	public LocalDateTime getPurchaseTime() {
+		return purchaseTime;
+	}
+	
+	public void setPurchaseTime(LocalDateTime purchaseTime) {
+		this.purchaseTime = purchaseTime;
+	}
+	
+	// NEW: Dynamically calculate when the ticket expires
+	public LocalDateTime getExpiryTime() {
+		if (purchaseTime == null) {
+			return null;
+		}
+		
+		switch (this.ticketType) {
+			case SINGLE:
+				return purchaseTime.plusHours(2);
+			case DAILY:
+				return purchaseTime.plusDays(1);
+			case MONTHLY:
+				return purchaseTime.plusDays(30);
+			default:
+				return purchaseTime;
+		}
 	}
 	
 	// Update the ticket status, an active ticket can only be changed to USED or CANCELLED
@@ -110,8 +140,8 @@ public class Ticket {
 		this.train = train;
 		this.ticketType = ticketType;
 		this.fare = fare;
-		
 		this.ticketStatus = TicketStatus.ACTIVE; 
+		this.purchaseTime = LocalDateTime.now(); 
 	}
 	
 	public void printTicket() {	    
@@ -134,6 +164,20 @@ public class Ticket {
 	    
 	    System.out.printf("%-25s: %s%n", "Ticket type", ticketType);
 	    System.out.printf("%-25s: RM %.2f%n", "Fare", fare);
+	    
+	    // Format dates for printing
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
+	    
+	    if (purchaseTime != null) {
+	    	System.out.printf("%-25s: %s%n", "Purchase Time", purchaseTime.format(formatter));
+	    	
+	    	// NEW: Print the Expiry Time
+	    	LocalDateTime expiryTime = getExpiryTime();
+	    	if (expiryTime != null) {
+	    		System.out.printf("%-25s: %s%n", "Valid Until (Expiry)", expiryTime.format(formatter));
+	    	}
+	    }
+	    
 	    System.out.printf("%-25s: %s%n", "Ticket status", ticketStatus);
 	    
 	    System.out.println("--------------------------------------------------");

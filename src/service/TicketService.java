@@ -1,5 +1,6 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import enums.TicketType;
 import enums.TicketStatus;
@@ -70,7 +71,35 @@ public class TicketService {
 		this.trainService = trainService;
 		
 	}
+	
+	public void autoUpdateTicketStatuses() {
+	    boolean dataChanged = false;
+	    LocalDateTime currentTime = LocalDateTime.now();
 
+	    for (Ticket ticket : tickets) {
+	        if (ticket.getStatus() == TicketStatus.ACTIVE) {
+	            if (isTicketExpired(ticket, currentTime)) {
+	                ticket.useTicket(); 
+	                dataChanged = true;
+	            }
+	        }
+	    }
+
+	    if (dataChanged) {
+	        try {
+	            saveTickets();
+	        } catch (FileProcessingException e) {
+	            System.out.println("[WARNING]: Could not save auto-updated ticket statuses to file.");
+	        }
+	    }
+	}
+
+	private boolean isTicketExpired(Ticket ticket, LocalDateTime currentTime) {
+	    if (ticket.getExpiryTime() == null) return false;
+	    
+	    return currentTime.isAfter(ticket.getExpiryTime());
+	}
+	
 	public boolean hasActivePass(Passenger passenger) {
 		for (Ticket t : tickets) {
 			if (t.getPassenger().getUserId().equals(passenger.getUserId())) {
@@ -164,6 +193,8 @@ public class TicketService {
 	        throw new IllegalArgumentException("[ERROR]: User cannot be null.");
 	    }
 	    
+	    autoUpdateTicketStatuses();
+	    
 	    System.out.println("\n----------------- TICKET DETAILS -----------------");
 	    
 	    if (user.getRole() == UserRole.ADMIN) {
@@ -226,7 +257,8 @@ public class TicketService {
 						  trainIdStr,
 						  ticket.getTicketType().name(),
 						  ticket.getStatus().name(),
-						  ticket.getFare()
+						  ticket.getFare(),
+						  ticket.getPurchaseTime()
 						  );
 
 			if (i < tickets.size() - 1) {
@@ -271,6 +303,14 @@ public class TicketService {
 	            String statusText = JsonUtil.extractString(block, "ticketStatus");
 	            TicketStatus status = TicketStatus.valueOf(statusText);
 	            double fare = JsonUtil.extractNumber(block, "fare");
+	            
+	            String timeStr = JsonUtil.extractString(block, "purchaseTime");
+	            LocalDateTime purchaseTime;
+	            if (timeStr != null && !timeStr.trim().isEmpty() && !timeStr.equals("null")) {
+	                purchaseTime = LocalDateTime.parse(timeStr);
+	            } else {
+	                purchaseTime = LocalDateTime.now(); // Fallback if no time is saved yet
+	            }
 
 	            Passenger passenger = userService.findPassengerById(passengerId);
 
@@ -299,7 +339,9 @@ public class TicketService {
 	            }
 
 	            Ticket ticket = new Ticket(ticketId, passenger, source, destination, train, ticketType, fare);
-
+	            
+	            ticket.setPurchaseTime(purchaseTime);
+	            
 	            if (status == TicketStatus.CANCELLED) {
 	                ticket.cancelTicket();
 	            } 
@@ -309,6 +351,8 @@ public class TicketService {
 	            
 	            tickets.add(ticket);
 	        }
+	        
+	    autoUpdateTicketStatuses();
 	        
 	    } catch (FileProcessingException e) {
 	        System.out.println("[INFO]: No existing tickets found. Starting fresh.");
