@@ -1,11 +1,14 @@
 package model;
 
+import enums.OperationalStatus;
+
 public class Route {
 
     private String routeId;
     private Station source;
     private Station destination;
     private double distanceKm;
+    private OperationalStatus status;
 
     public Route(String routeId, Station source, Station destination, double distanceKm) {
         if (routeId == null || routeId.trim().isEmpty()) {
@@ -28,6 +31,7 @@ public class Route {
         this.source = source;
         this.destination = destination;
         this.distanceKm = distanceKm;
+        this.status = OperationalStatus.ACTIVE;
     }
 
     // Accessors - needed so RouteService can read a Route's private fields
@@ -45,6 +49,10 @@ public class Route {
 
     public double getDistanceKm() {
         return distanceKm;
+    }
+    
+    public OperationalStatus getStatus() {
+        return status;
     }
     
     public void setSource(Station source) {
@@ -66,6 +74,13 @@ public class Route {
             throw new IllegalArgumentException("[ERROR]: Distance must be greater than 0.");
         }
         this.distanceKm = distance;
+    }
+    
+    public void setStatus(OperationalStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("[ERROR]: Status cannot be null.");
+        }
+        this.status = status;
     }
 
     public double calculateDistance() {

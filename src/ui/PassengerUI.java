@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import enums.OperationalStatus;
 import enums.TicketType;
 import exception.FileProcessingException;
 import exception.TicketNotFoundException;
@@ -270,7 +271,6 @@ public class PassengerUI {
 	        }
 
 	        if (ticketChoice.equals("2") || ticketChoice.equals("3")) {
-	            
 	            if (ticketService.hasActivePass(passenger)) {
 	                System.out.println("[ERROR]: You already own an active Daily or Monthly Pass. You can only hold one at a time.");
 	                continue;
@@ -285,56 +285,72 @@ public class PassengerUI {
 	        double fare = 0.0;
 	        
 	        switch (ticketChoice) {
-	            case "1":
-	                selectedType = TicketType.SINGLE;
+	        case "1":
+	            selectedType = TicketType.SINGLE;
+	            
+	            ArrayList<Station> allStations = stationService.getAllStations();
+	            
+	            if (allStations == null || allStations.isEmpty()) {
+	                System.out.println("[ERROR]: No stations available in the system.");
+	                continue;
+	            }
+	            
+	            System.out.println("\n[AVAILABLE STATIONS]");
+
+	            for (int i = 0; i < allStations.size(); i++) {
+	                Station s = allStations.get(i);
+	                if (s.getStatus() == enums.OperationalStatus.ACTIVE) {
+	                    System.out.printf("(%d) %s\n", (i + 1), s.getName());
+	                } else {
+	                    System.out.printf("[X] %s (CLOSED)\n", s.getName());
+	                }
+	            }
+	            
+	            try {
+	                System.out.print("\nSelect Source Station (Number): ");
+	                int srcChoice = Integer.parseInt(sc.nextLine().trim());
+	                source = allStations.get(srcChoice - 1);
 	                
-	                ArrayList<Station> allStations = stationService.getAllStations();
+	                if (source.getStatus() != enums.OperationalStatus.ACTIVE) {
+	                    System.out.println("[ERROR]: Sorry, " + source.getName() + " is currently closed. Please select an active station.");
+	                    continue; 
+	                }
 	                
-	                if (allStations == null || allStations.isEmpty()) {
-	                    System.out.println("[ERROR]: No stations available in the system.");
+	                System.out.print("Select Destination Station (Number): ");
+	                int destChoice = Integer.parseInt(sc.nextLine().trim());
+	                destination = allStations.get(destChoice - 1);
+	                
+	                if (destination.getStatus() != enums.OperationalStatus.ACTIVE) {
+	                    System.out.println("[ERROR]: Sorry, " + destination.getName() + " is currently closed. Please select an active station.");
+	                    continue; 
+	                }
+	                
+	                if (source.getStationId().equals(destination.getStationId())) {
+	                    System.out.println("[ERROR]: Source and destination cannot be the same.");
 	                    continue;
 	                }
 	                
-	                System.out.println("\n[AVAILABLE STATIONS]");
-	                for (int i = 0; i < allStations.size(); i++) {
-	                    System.out.printf("(%d) %s\n", (i + 1), allStations.get(i).getName());
+	                ArrayList<Route> routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
+	                
+	                if (routes == null || routes.isEmpty()) {
+	                    System.out.println("[ERROR]: No connecting routes found between these stations.");
+	                    continue;
 	                }
 	                
-	                try {
-	                    System.out.print("Select Source Station (Number): ");
-	                    int srcChoice = Integer.parseInt(sc.nextLine().trim());
-	                    source = allStations.get(srcChoice - 1);
-	                    
-	                    System.out.print("Select Destination Station (Number): ");
-	                    int destChoice = Integer.parseInt(sc.nextLine().trim());
-	                    destination = allStations.get(destChoice - 1);
-	                    
-	                    if (source.getStationId().equals(destination.getStationId())) {
-	                        System.out.println("[ERROR]: Source and destination cannot be the same.");
-	                        continue;
-	                    }
-	                    
-	                    ArrayList<Route> routes = (ArrayList<Route>) routeService.findRoutes(source, destination);
-	                    
-	                    if (routes == null || routes.isEmpty()) {
-	                        System.out.println("[ERROR]: No connecting routes found between these stations.");
-	                        continue;
-	                    }
-	                    
-	                    for (Route route : routes) {
-	                        totalDistance += route.calculateDistance();
-	                    }
-	                    
-	                    fullRoute = new Route("R-TEMP", source, destination, totalDistance);
-	                    
-	                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-	                    System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
-	                    continue;
-	                } catch (IllegalArgumentException e) {
-	                    System.out.println(e.getMessage());
-	                    continue;
-	                }   
-	                break;
+	                for (Route route : routes) {
+	                    totalDistance += route.calculateDistance();
+	                }
+	                
+	                fullRoute = new Route("R-TEMP", source, destination, totalDistance);
+	                
+	            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+	                System.out.println("[ERROR]: Invalid selection. Please enter a valid number from the list.");
+	                continue;
+	            } catch (IllegalArgumentException e) {
+	                System.out.println(e.getMessage());
+	                continue;
+	            }   
+	            break;
 	                
 	            case "2":
 	                selectedType = TicketType.DAILY;
@@ -358,7 +374,7 @@ public class PassengerUI {
 	            continue;
 	        }
 	        
-	        // Proceed to Checkout
+	        // --- PROCEED TO CHECKOUT ---
 	        System.out.println("\n[ORDER SUMMARY]");
 	        System.out.println("Ticket Type   : " + selectedType);
 	        if (selectedType == TicketType.SINGLE) {

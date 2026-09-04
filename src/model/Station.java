@@ -2,11 +2,14 @@ package model;
 
 import java.util.Objects;
 
+import enums.OperationalStatus;
+
 public class Station {
 
     private String stationId;
     private String name;
     private String location;
+    private OperationalStatus status;
 
 	public Station(String stationId, String name, String location) {
         
@@ -24,6 +27,7 @@ public class Station {
         this.name = name;
         this.location = location;
         
+        this.status = OperationalStatus.ACTIVE;
     }
 
     public String getStationId() {
@@ -36,6 +40,10 @@ public class Station {
 
     public String getLocation() {
     	return location;
+    }
+    
+    public OperationalStatus getStatus() {
+        return status;
     }
     
     public void setStationId(String stationId) {
@@ -55,12 +63,21 @@ public class Station {
         }
         this.location = location;
     }
+    
+    public void setStatus(OperationalStatus status) {
+        if (status == null) {
+            throw new IllegalArgumentException("[ERROR]: Status cannot be null.");
+        }
+        this.status = status;
+    }
 
     //Display station info
     public void displayInfo() {
         System.out.printf("%-14s %s%n", "Station ID:", stationId);
         System.out.printf("%-14s %s%n", "Station Name:", name);
         System.out.printf("%-14s %s%n", "Location:", location);
+        System.out.println("Status     : " + status); 
+        System.out.println("-------------------------");
     }
     
     @Override

@@ -88,6 +88,7 @@ public class StationService {
 			System.out.println("Station ID : " + station.getStationId());
 			System.out.println("Name       : " + station.getName());
 			System.out.println("Location   : " + station.getLocation());
+	        System.out.println("Status     : " + station.getStatus()); 
 			System.out.println("---------------------------------");
 		}
 	}
@@ -118,12 +119,14 @@ public class StationService {
 				  {
 				    "stationId": "%s",
 				    "name": "%s",
-				    "location": "%s"
+				    "location": "%s",
+				    "status": "%s"
 				  }
 			  """.formatted(
 					  station.getStationId(),
 					  station.getName(),
-					  station.getLocation()
+					  station.getLocation(),
+					  station.getStatus().name()
 					  );
 
 			if (i < stations.size() - 1) {
@@ -166,8 +169,19 @@ public class StationService {
 				String name = JsonUtil.extractString(block, "name");
 				String location = JsonUtil.extractString(block, "location");
 				
+				String statusStr = JsonUtil.extractString(block, "status");
+				enums.OperationalStatus loadedStatus = enums.OperationalStatus.ACTIVE;
+
+				if (statusStr != null && !statusStr.isEmpty()) {
+				    try {
+				        loadedStatus = enums.OperationalStatus.valueOf(statusStr);
+				    } catch (IllegalArgumentException e) {
+				        System.out.println("[WARNING]: Unknown status '" + statusStr + "' for station " + stationId + ". Defaulting to ACTIVE.");
+				    }
+				}
+						
 				Station station = new Station(stationId, name, location);
-				
+				station.setStatus(loadedStatus);
 				stations.add(station);
 			}
 			
@@ -214,5 +228,29 @@ public class StationService {
 		} else {
 			System.out.println("[INFO]: No changes were made.");
 		}
+	}
+	
+	public void updateStationStatus(String stationId, enums.OperationalStatus newStatus) {
+	    if (stationId == null || stationId.trim().isEmpty()) {
+	        throw new IllegalArgumentException("[ERROR]: Station ID cannot be empty.");
+	    }
+	    
+	    if (newStatus == null) {
+	        throw new IllegalArgumentException("[ERROR]: New status cannot be null.");
+	    }
+	    
+	    Station station = findStationById(stationId.trim());
+	    
+	    if (station == null) {
+	        throw new IllegalArgumentException("[ERROR]: Station ID " + stationId + " not found.");
+	    }
+	    
+	    station.setStatus(newStatus);
+	    
+	    try {
+	        saveStations(); 
+	    } catch (Exception e) {
+	        throw new IllegalStateException("[ERROR]: Status updated in memory, but failed to save to file.", e);
+	    }
 	}
 }

@@ -116,7 +116,8 @@ public class AdminUI {
 			
 			System.out.println("(1) View Stations");
 			System.out.println("(2) Add Stations");
-			System.out.println("(3) Edit Station");
+			System.out.println("(3) Edit Station (Name/Location)");
+	        System.out.println("(4) Manage Station Status (Active/Inactive/Maintenance)");
 			System.out.println("(0) Back to Main Dashboard");
 			System.out.print("Enter your choice: ");
 			
@@ -211,13 +212,17 @@ public class AdminUI {
                     System.out.println(e.getMessage());
                 }
                 break;
+			
+			case "4":
+				manageStationStatusUI();
+				break;
 				
 			case "0":
 	        	back = true;
 	        	break;
 	        	
 	    	default:
-	    		System.out.println("[ERROR]: Invalid input, please enter 0-2.");
+	    		System.out.println("[ERROR]: Invalid input, please enter 0-4.");
 	    		break;
 			}
 		}
@@ -233,6 +238,7 @@ public class AdminUI {
 			System.out.println("(1) View Routes");
 			System.out.println("(2) Add Route");
 			System.out.println("(3) Edit Route");
+			System.out.println("(4) Manage Route Status (Suspend/Activate)");
 			System.out.println("(0) Back to Main Dashboard");
 	        System.out.print("Enter your choice: ");
 	        
@@ -342,12 +348,37 @@ public class AdminUI {
 	        	
 	        	break;
 	        	
+	        case "3":
+	        	System.out.println("\n[EDIT ROUTE]");
+	            System.out.print("Enter Route ID to edit (e.g., R001): ");
+	            String editId = sc.nextLine().trim();
+	            
+	            try {
+	                Route targetRoute = routeService.findRouteById(editId);
+	                
+	                System.out.println("\n[CURRENT DETAILS]");
+	                System.out.println("Route: " + targetRoute.getSource().getName() + " -> " + targetRoute.getDestination().getName());
+	                System.out.println("Current Distance: " + targetRoute.calculateDistance() + " km");
+	                
+	                System.out.print("\nEnter New Distance in km (e.g., 6.5): ");
+	                double newDistance = Double.parseDouble(sc.nextLine().trim());
+	                
+	                // You will need to add an updateRouteDistance method in your RouteService
+	                routeService.updateRouteDistance(editId, newDistance);
+	                System.out.println("[SUCCESS]: Route distance updated successfully!");
+	                
+	            } catch (NumberFormatException e) {
+	                System.out.println("[ERROR]: Invalid format. Please enter a valid number.");
+	            } catch (IllegalArgumentException | IllegalStateException e) {
+	                System.out.println(e.getMessage());
+	            }
+	       
 	        case "0":
 	        	back = true;
 	        	break;
 	        	
 	    	default:
-	    		System.out.println("[ERROR]: Invalid input, please enter 0-2.");
+	    		System.out.println("[ERROR]: Invalid input, please enter 0-3.");
 	    		break;
 	        }
 		}		
@@ -583,6 +614,59 @@ public class AdminUI {
 	                System.out.println("[ERROR]: Invalid input. Please enter 0 or 1.");
 	                break;
 	        }
+	    }
+	}
+	
+	private void manageStationStatusUI() {
+	    System.out.println("\n[MANAGE STATION STATUS]");
+	    System.out.print("Enter Station ID to manage (e.g., STN001): ");
+	    String editId = sc.nextLine().trim();
+	    
+	    try {
+	        Station targetStation = stationService.findStationById(editId);
+	        
+	        boolean back = false;
+	        while (!back) {
+	            System.out.println("\n[STATION DETAILS]");
+	            System.out.println("Name: " + targetStation.getName());
+	            System.out.println("Current Status: " + targetStation.getStatus());
+	            
+	            System.out.println("\n[SET NEW STATUS]");
+	            System.out.println("(1) Set to ACTIVE (Normal operations)");
+	            System.out.println("(2) Set to INACTIVE (Soft delete / Permanently closed)");
+	            System.out.println("(3) Set to UNDER_MAINTENANCE (Temporary closure)");
+	            System.out.println("(0) Cancel / Go Back");
+	            System.out.print("Enter your choice: ");
+	            
+	            String choice = sc.nextLine().trim();
+	            
+	            switch (choice) {
+	                case "1":
+	                    stationService.updateStationStatus(editId, enums.OperationalStatus.ACTIVE);
+	                    System.out.println("[SUCCESS]: Station is now ACTIVE.");
+	                    back = true;
+	                    break;
+	                case "2":
+	                    stationService.updateStationStatus(editId, enums.OperationalStatus.INACTIVE);
+	                    System.out.println("[SUCCESS]: Station is now INACTIVE (Soft Deleted).");
+	                    back = true;
+	                    break;
+	                case "3":
+	                    stationService.updateStationStatus(editId, enums.OperationalStatus.UNDER_MAINTENANCE);
+	                    System.out.println("[SUCCESS]: Station is now UNDER MAINTENANCE.");
+	                    back = true;
+	                    break;
+	                case "0":
+	                    System.out.println("Returning to previous menu...");
+	                    back = true;
+	                    break;
+	                default:
+	                    System.out.println("[ERROR]: Invalid input. Please enter 0-3.");
+	                    break;
+	            }
+	        }
+	    } catch (IllegalArgumentException | IllegalStateException e) {
+	        System.out.println(e.getMessage());
 	    }
 	}
 }

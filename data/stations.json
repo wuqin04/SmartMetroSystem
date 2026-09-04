@@ -2,175 +2,204 @@
  {
    "stationId": "STN001",
    "name": "Kajang",
-   "location": "KTM interchange"
+   "location": "KTM interchange",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN002",
    "name": "Stadium Kajang",
-   "location": "Town center"
+   "location": "Town center",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN003",
    "name": "Sungai Jernih",
-   "location": "Near Hospital Kajang"
+   "location": "Near Hospital Kajang",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN004",
    "name": "Bukit Dukung",
-   "location": "Near Sungai Long"
+   "location": "Near Sungai Long",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN005",
    "name": "Batu Sebelas Cheras (Batu 11)",
-   "location": "Cheras-Kajang Station"
+   "location": "Cheras-Kajang Station",
+   "status": "INACTIVE"
  }
 ,
  {
    "stationId": "STN006",
    "name": "Bandar Tun Hussein Onn",
-   "location": "Near Aeon Cheras Selatan"
+   "location": "Near Aeon Cheras Selatan",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN007",
    "name": "Sri Raya",
-   "location": "Cheras Batu 9"
+   "location": "Cheras Batu 9",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN008",
    "name": "Taman Suntex",
-   "location": "Cheras-Kajang highway corridor"
+   "location": "Cheras-Kajang highway corridor",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN009",
    "name": "Taman Connaught",
-   "location": "Near UCSI University"
+   "location": "Near UCSI University",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN010",
    "name": "Taman Mutiara",
-   "location": "Near EkoCheras and Leisure Mall"
+   "location": "Near EkoCheras and Leisure Mall",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN011",
    "name": "Taman Midah",
-   "location": "Near Hospital Universiti Kebangsaan Malaysia (HUKM)"
+   "location": "Near Hospital Universiti Kebangsaan Malaysia (HUKM)",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN012",
    "name": "Taman Pertama",
-   "location": "Cheras residential area"
+   "location": "Cheras residential area",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN013",
    "name": "Maluri",
-   "location": "Interchange for Ampang Line"
+   "location": "Interchange for Ampang Line",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN014",
    "name": "Cochrane",
-   "location": "Near MyTown and IKEA Cheras"
+   "location": "Near MyTown and IKEA Cheras",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN015",
    "name": "Tun Razak Exchange (TRX)",
-   "location": "Financial hub and Putrajaya Line interchange"
+   "location": "Financial hub and Putrajaya Line interchange",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN016",
    "name": "Pavilion Bukit Bintang",
-   "location": "City shopping district"
+   "location": "City shopping district",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN017",
    "name": "Merdeka",
-   "location": "Near Stadium Merdeka"
+   "location": "Near Stadium Merdeka",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN018",
    "name": "Pasar Seni",
-   "location": "Interchange for Kelana Jaya Line"
+   "location": "Interchange for Kelana Jaya Line",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN019",
    "name": "Muzium Negara",
-   "location": "Linked to KL Sentral"
+   "location": "Linked to KL Sentral",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN020",
    "name": "Semantan",
-   "location": "Edge of Damansara Heights"
+   "location": "Edge of Damansara Heights",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN021",
    "name": "Pusat Bandar Damansara",
-   "location": "Corporate enclave"
+   "location": "Corporate enclave",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN022",
    "name": "Phileo Damansara",
-   "location": "Near Section 16 PJ"
+   "location": "Near Section 16 PJ",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN023",
    "name": "Taman Tun Dr Ismail (TTDI)",
-   "location": "Residential and commercial hub"
+   "location": "Residential and commercial hub",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN024",
    "name": "Bandar Utama",
-   "location": "Near 1 Utama"
+   "location": "Near 1 Utama",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN025",
    "name": "Mutiara Damansara",
-   "location": "Near The Curve and IKEA"
+   "location": "Near The Curve and IKEA",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN026",
    "name": "Surian",
-   "location": "Near Sunway Nexis"
+   "location": "Near Sunway Nexis",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN027",
    "name": "Kota Damansara",
-   "location": "Near SEGI Univerisity"
+   "location": "Near SEGI Univerisity",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN028",
    "name": "Kwasa Sentral",
-   "location": "Suburbs near Kota Damansara"
+   "location": "Suburbs near Kota Damansara",
+   "status": "ACTIVE"
  }
 ,
  {
    "stationId": "STN029",
    "name": "Kwasa Damansara",
-   "location": "Terminal interchange"
+   "location": "Terminal interchange",
+   "status": "ACTIVE"
  }
 
 ]

@@ -1,7 +1,11 @@
 package service;
  
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 import exception.FileProcessingException;
 import repository.FileManager;
@@ -30,19 +34,6 @@ public class RouteService {
     	return routes;
     }
  
-    /**
-     * Finds a sequence of routes connecting the requested source and destination,
-     * traversing through intermediate stations if there is no direct route
-     * (e.g. Kajang -> Bukit Bintang -> TRX). Since trains can travel both ways
-     * along a route, each stored Route is treated as usable in either direction.
-     *
-     * Builds the path step by step: starting from source, repeatedly scans
-     * the routes list to find a route connecting the current station to any
-     * unvisited station, until destination is reached.
-     *
-     * @return an ordered list of routes forming a path from source to destination
-     *         (never empty; throws if no path exists)
-     */
     public List<Route> findRoutes(Station source, Station destination) {
         if (source == null || destination == null) {
             throw new IllegalArgumentException("[ERROR]: Source and destination stations cannot be null.");
@@ -51,42 +42,68 @@ public class RouteService {
             throw new IllegalArgumentException("[ERROR]: Source and destination stations cannot be the same.");
         }
 
-        List<Route> path = new ArrayList<>();
+        Queue<Station> queue = new LinkedList<>();
         List<Station> visited = new ArrayList<>();
+        
+        Map<Station, Route> routeTracker = new HashMap<>(); 
 
-        Station current = source;
-        visited.add(current);
+        queue.add(source);
+        visited.add(source);
+        boolean destinationFound = false;
 
-        while (!current.equals(destination)) {
-            Route nextRoute = null;
-            Station nextStation = null;
+        while (!queue.isEmpty()) {
+            Station current = queue.poll();
 
+            if (current.equals(destination)) {
+                destinationFound = true;
+                break; // We found the destination, stop searching!
+            }
+
+            // Look at all routes to find the neighbors of the current station
             for (Route route : routes) {
-                boolean forward = route.getSource().equals(current) && !visited.contains(route.getDestination());
-                boolean backward = route.getDestination().equals(current) && !visited.contains(route.getSource());
+                Station neighbor = null;
+                
+                // Check if this route connects to our current station
+                if (route.getSource().equals(current)) {
+                    neighbor = route.getDestination();
+                } else if (route.getDestination().equals(current)) {
+                    neighbor = route.getSource();
+                }
 
-                if (forward) {
-                    nextRoute = route;
-                    nextStation = route.getDestination();
-                    break;
-                } else if (backward) {
-                    nextRoute = route;
-                    nextStation = route.getSource();
-                    break;
+                // If we found a valid, unvisited neighbor, add it to our queue
+                if (neighbor != null && !visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                    routeTracker.put(neighbor, route); // Remember how we got here
                 }
             }
-
-            if (nextRoute == null) {
-                throw new IllegalArgumentException("[ERROR]: No route was found from "
-                        + source.getName() + " to " + destination.getName() + ".");
-            }
-
-            path.add(nextRoute);
-            visited.add(nextStation);
-            current = nextStation;
         }
 
-        return path;
+        // 3. Handle Failure
+        if (!destinationFound) {
+            throw new IllegalArgumentException("[ERROR]: No route was found from " 
+                    + source.getName() + " to " + destination.getName() + ".");
+        }
+
+        // 4. Reconstruct the Path Backwards
+        List<Route> finalPath = new ArrayList<>();
+        Station step = destination;
+        
+        while (!step.equals(source)) {
+            Route takenRoute = routeTracker.get(step);
+            
+            // Add to the FRONT of the list so it reads logically from Source -> Destination
+            finalPath.add(0, takenRoute); 
+            
+            // Move backward to the previous station
+            if (takenRoute.getSource().equals(step)) {
+                step = takenRoute.getDestination();
+            } else {
+                step = takenRoute.getSource();
+            }
+        }
+
+        return finalPath;
     }
 
     /** Prints every stored route to the console, separated by a divider line. */
@@ -204,6 +221,68 @@ public class RouteService {
             saveRoutes();
         } catch (FileProcessingException e) {
             throw new IllegalStateException("[ERROR]: Route added but could not be saved.");
+        }
+    }
+    
+    public void updateRouteStatus(String routeId, enums.OperationalStatus newStatus) {
+        if (routeId == null || routeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("[ERROR]: Route ID cannot be empty.");
+        }
+        
+        if (newStatus == null) {
+            throw new IllegalArgumentException("[ERROR]: New status cannot be null.");
+        }
+        
+        Route route = findRouteById(routeId.trim());
+        
+        if (route == null) {
+            throw new IllegalArgumentException("[ERROR]: Route ID " + routeId + " not found.");
+        }
+        
+        route.setStatus(newStatus);
+        
+        try {
+            saveRoutes(); 
+        } catch (Exception e) {
+            throw new IllegalStateException("[ERROR]: Route status updated in memory, but failed to save to file.", e);
+        }
+    }
+    
+    public Route findRouteById(String routeId) {
+        if (routeId == null || routeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("[ERROR]: Route ID cannot be empty.");
+        }
+        
+        for (Route route : routes) {
+            if (route.getRouteId().equalsIgnoreCase(routeId.trim())) {
+                return route;
+            }
+        }
+        throw new IllegalArgumentException("[ERROR]: Route ID '" + routeId + "' not found.");
+    }
+    
+    public void updateRouteDistance(String routeId, double newDistance) {
+        if (routeId == null || routeId.trim().isEmpty()) {
+            throw new IllegalArgumentException("[ERROR]: Route ID cannot be empty.");
+        }
+        
+        if (newDistance <= 0) {
+            throw new IllegalArgumentException("[ERROR]: Distance must be greater than 0 km.");
+        }
+        
+        Route route = findRouteById(routeId.trim());
+        
+        if (route == null) {
+            throw new IllegalArgumentException("[ERROR]: Route ID " + routeId + " not found.");
+        }
+        
+        // Update the distance
+        route.setDistance(newDistance);
+        
+        try {
+            saveRoutes(); 
+        } catch (Exception e) {
+            throw new IllegalStateException("[ERROR]: Route distance updated in memory, but failed to save to file.", e);
         }
     }
 }
