@@ -238,7 +238,6 @@ public class AdminUI {
 			System.out.println("(1) View Routes");
 			System.out.println("(2) Add Route");
 			System.out.println("(3) Edit Route");
-			System.out.println("(4) Manage Route Status (Suspend/Activate)");
 			System.out.println("(0) Back to Main Dashboard");
 	        System.out.print("Enter your choice: ");
 	        

@@ -53,5 +53,71 @@
    "ticketStatus": "ACTIVE",
    "fare": 19.66
  }
+,
+ {
+   "ticketId": "T006",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN020",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 19.66
+ }
+,
+ {
+   "ticketId": "T007",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
+,
+ {
+   "ticketId": "T008",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
+,
+ {
+   "ticketId": "T009",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
+,
+ {
+   "ticketId": "T010",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
+,
+ {
+   "ticketId": "T011",
+   "passengerId": "USER1786096437063",
+   "sourceId": "STN001",
+   "destinationId": "STN002",
+   "trainId": "TRN001",
+   "ticketType": "SINGLE",
+   "ticketStatus": "ACTIVE",
+   "fare": 2.14
+ }
 
 ]

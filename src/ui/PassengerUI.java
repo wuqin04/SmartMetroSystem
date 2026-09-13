@@ -425,9 +425,15 @@ public class PassengerUI {
 	                try {
 	                    if (paymentMethod.pay(fare)) {
 	                        try {
+	                            // 1. Buy the ticket
 	                            ticketService.buyTicket(passenger, fullRoute, selectedType);
 	                            paymentSuccess = true;
 	                            System.out.println("[SUCCESS]: Ticket purchased successfully!");
+	                            
+	                            // 2. THE FIX: Save the updated user balance to users.json!
+	                            // (Assuming your saveUsers() method is public. If it's private, change it to public in UserService)
+	                            userService.saveUsers(); 
+	                            
 	                        } catch (Exception e) { 
 	                            System.out.println(e.getMessage());
 	                        }

@@ -65,4 +65,8 @@ public class Passenger extends User {
             this.setDiscountType(DiscountType.NONE);
 		}
 	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
 }
